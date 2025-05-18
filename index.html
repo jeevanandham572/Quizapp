@@ -1,171 +1,156 @@
-<!DOCTYPE html><html lang="en"><head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gen-Z Health Score Quiz</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-</head><body>
-  <div class="container">
-    <h1>Health Check Quiz <span>💪</span></h1>
-    <form id="quizForm"></form>
-    <button type="button" onclick="submitQuiz()">Check My Score</button>
-    <div id="result"></div>
-  </div>  <script>
-    const questions = [
-      "Do you sleep 7–9 hours every night? 😴",
-      "Do you drink at least 2 liters of water daily? 💧",
-      "Do you engage in 150+ minutes of exercise weekly? 🏃‍♀️",
-      "Do you eat 5+ servings of fruits and vegetables daily? 🥦",
-      "Do you limit sugar to <10% of your calories? 🍰",
-      "Do you avoid tobacco products completely? 🚭",
-      "Do you limit alcohol as per guidelines? 🍷",
-      "Do you manage stress effectively? 🧘",
-      "Do you go for annual checkups? 🩺",
-      "Is your BMI within the healthy range? ⚖️",
-      "Do you brush and floss daily? 🪥",
-      "Do you get sunlight for Vitamin D? ☀️",
-      "Do you avoid highly processed foods? 🥓",
-      "Do you wear seatbelts while driving? 🚗",
-      "Are your vaccinations up to date? 💉",
-      "Do you limit screen time and take regular breaks? 💻",
-      "Do you wash hands before meals and after restroom? 🧼",
-      "Do you avoid screens before sleep? 🌙",
-      "Do you avoid sugary drinks? 🥤",
-      "Do you consume whole grains regularly? 🍚",
-      "Do you protect your ears from loud sounds? 🎧",
-      "Do you eat home-cooked meals frequently? 🍲",
-      "Do you check nutrition labels on food? 🏷️",
-      "Do you spend time in nature weekly? 🌳",
-      "Do you take breaks for mental wellness? 🧠"
-    ];
-
-    const options = [
-      ["Always", "Sometimes", "Rarely"],
-      ["Yes, daily", "Occasionally", "No"],
-      ["Yes", "Some weeks", "No"],
-      ["Yes", "Not always", "Rarely"],
-      ["Yes", "I try", "No"],
-      ["Yes", "Trying to quit", "No"],
-      ["Yes", "Sometimes more", "No"],
-      ["Yes", "Sometimes", "No"],
-      ["Yes", "Sometimes", "Never"],
-      ["Yes", "Not sure", "No"],
-      ["Yes", "Once daily", "No"],
-      ["Yes", "Not daily", "No"],
-      ["Yes", "Sometimes", "Often eat them"],
-      ["Always", "Sometimes", "Never"],
-      ["Yes", "Some pending", "No idea"],
-      ["Yes", "Rarely", "No"],
-      ["Always", "Sometimes", "Rarely"],
-      ["Yes", "Sometimes", "No"],
-      ["Never drink them", "Occasionally", "Daily"],
-      ["Yes", "Sometimes", "No"],
-      ["Yes", "Sometimes", "No"],
-      ["Yes", "Sometimes", "Rarely"],
-      ["Always", "Sometimes", "Never"],
-      ["Yes", "Sometimes", "Never"],
-      ["Yes", "Sometimes", "No"]
-    ];
-
-    const quizForm = document.getElementById('quizForm');
-
-    questions.forEach((q, i) => {
-      const div = document.createElement('div');
-      div.className = 'question';
-      let optionsHTML = '';
-      options[i].forEach((opt, idx) => {
-        optionsHTML += `<label><input type="radio" name="q${i}" value="${3 - idx}"> ${opt}</label>`;
-      });
-      div.innerHTML = `<p>${i + 1}. ${q}</p>${optionsHTML}`;
-      quizForm.appendChild(div);
-    });
-
-    function submitQuiz() {
-      const total = questions.length * 3;
-      let score = 0;
-      for (let i = 0; i < questions.length; i++) {
-        const selected = document.querySelector(`input[name=q${i}]:checked`);
-        if (!selected) {
-          alert('Please answer all questions.');
-          return;
-        }
-        score += parseInt(selected.value);
-      }
-
-      const percent = (score / total) * 100;
-      let emoji = '😐';
-      let message = "You're doing okay, but there's room to grow!";
-      if (percent >= 80) {
-        emoji = '🔥';
-        message = "Amazing! You're in great health!";
-      } else if (percent < 50) {
-        emoji = '⚠️';
-        message = "Caution! Time to focus on your health.";
-      }
-
-      document.getElementById('result').innerHTML = `
-        <p>Your Health Score: <strong>${percent.toFixed(0)}%</strong> ${emoji}</p>
-        <p>${message}</p>
-      `;
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Full Diet Score Analyzer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #f9d423, #ff4e50);
+      margin: 0;
+      padding: 2rem;
+      color: #333;
     }
-  </script></body></html><style>
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(to right, #fbc2eb, #a6c1ee);
-  color: #333;
-  display: flex;
-  justify-content: center;
-  padding: 2rem;
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .question {
+      margin-bottom: 1.5rem;
+      background: #f7f7f7;
+      padding: 1rem;
+      border-radius: 10px;
+    }
+    .question p {
+      font-weight: bold;
+    }
+    label {
+      display: block;
+      margin: 0.3rem 0;
+    }
+    button {
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 1rem;
+      width: 100%;
+      font-size: 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #219150;
+    }
+    #result {
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Diet Score Analyzer Quiz 🥗</h1>
+    <form id="dietForm"></form>
+    <button onclick="calculateDietScore()">Submit & Calculate Score</button>
+    <div id="result"></div>
+  </div>
+  <script>
+    const questions = [
+      "How many servings of fruits & vegetables do you eat daily?",
+      "What type of grains do you usually eat?",
+      "How often do you eat fast food/fried foods?",
+      "How many sugary drinks do you consume weekly?",
+      "How often do you eat processed meats?",
+      "What kind of oil/fat do you primarily use for cooking?",
+      "How often do you consume legumes, beans, or pulses?",
+      "What kind of snacks do you usually choose?",
+      "How many glasses of water do you drink per day?",
+      "Do you eat breakfast every day?",
+      "What is your protein intake source?",
+      "How much salt do you consume?",
+      "How often do you eat out or order food?",
+      "Do you eat mindfully and stop when full?",
+      "What best describes your meal composition?",
+      "How often do you eat fermented foods?",
+      "Do you limit ultra-processed foods?",
+      "Do you track your calories/macros or follow dietary guidelines?",
+      "What portion size do you usually consume?",
+      "Do you feel bloated or sluggish after meals?"
+    ];const options = [
+  ["a) 6 or more", "b) 4–5", "c) 2–3", "d) 1", "e) None"],
+  ["a) 100% whole grains", "b) Mostly whole grains", "c) Half-half", "d) Mostly refined", "e) Only refined"],
+  ["a) Never", "b) Once a month", "c) 1–2x/week", "d) 3–4x/week", "e) Daily"],
+  ["a) None", "b) 1–2", "c) 3–4", "d) 5–6", "e) Daily"],
+  ["a) Never", "b) 1–2x/month", "c) Once/week", "d) Few times/week", "e) Daily"],
+  ["a) Olive oil", "b) Canola/sunflower", "c) Mixed oils", "d) Butter/ghee", "e) Hydrogenated oil"],
+  ["a) Daily", "b) 4–5x/week", "c) 2–3x/week", "d) Once/week", "e) Rarely"],
+  ["a) Fruits/nuts", "b) Roasted snacks", "c) Baked snacks", "d) Chips/cookies", "e) Fried junk"],
+  ["a) 10+ glasses", "b) 8–10", "c) 6–7", "d) 4–5", "e) <4"],
+  ["a) Always", "b) 5–6x/week", "c) 3–4x/week", "d) 1–2x/week", "e) Never"],
+  ["a) Lean/plant based", "b) Mostly vegetarian", "c) Mixed", "d) Low protein", "e) High-fat meats"],
+  ["a) Low/no extra", "b) Normal", "c) Add a little", "d) Add every meal", "e) Very salty"],
+  ["a) 1–2/month", "b) Weekly", "c) 2–3x/week", "d) 4–5x/week", "e) Daily"],
+  ["a) Always", "b) Mostly", "c) Sometimes", "d) Rarely", "e) Never"],
+  ["a) Balanced", "b) Mostly balanced", "c) Sometimes", "d) Often unbalanced", "e) Unhealthy"],
+  ["a) Daily", "b) 4–5x/week", "c) 2–3x/week", "d) Occasionally", "e) Never"],
+  ["a) Avoid completely", "b) Rarely", "c) Occasionally", "d) Often", "e) Regularly"],
+  ["a) Yes, strictly", "b) Mostly", "c) Sometimes", "d) Rarely", "e) Never"],
+  ["a) Controlled", "b) Moderate", "c) Sometimes large", "d) Often large", "e) Always large"],
+  ["a) Never", "b) Rarely", "c) Sometimes", "d) Often", "e) Almost always"]
+];
+
+const form = document.getElementById('dietForm');
+questions.forEach((q, i) => {
+  const div = document.createElement('div');
+  div.className = 'question';
+  let html = `<p>${i + 1}. ${q}</p>`;
+  options[i].forEach((opt, j) => {
+    html += `<label><input type="radio" name="q${i}" value="${5 - j}" required> ${opt}</label>`;
+  });
+  div.innerHTML = html;
+  form.appendChild(div);
+});
+
+function calculateDietScore() {
+  event.preventDefault();
+  let score = 0;
+  for (let i = 0; i < questions.length; i++) {
+    const selected = document.querySelector(`input[name=q${i}]:checked`);
+    if (!selected) {
+      alert('Please answer all questions.');
+      return;
+    }
+    score += parseInt(selected.value);
+  }
+
+  let resultMsg = "";
+  if (score >= 90) {
+    resultMsg = `Your Score: ${score}/100 🌟<br>Excellent diet! Keep it up!`;
+  } else if (score >= 75) {
+    resultMsg = `Your Score: ${score}/100 👍<br>Very good, just minor improvements needed.`;
+  } else if (score >= 55) {
+    resultMsg = `Your Score: ${score}/100 ⚖️<br>Moderate — work on improving your habits.`;
+  } else if (score >= 35) {
+    resultMsg = `Your Score: ${score}/100 ⚠️<br>Poor diet — time to make healthy changes.`;
+  } else {
+    resultMsg = `Your Score: ${score}/100 🚨<br>Very unhealthy diet. Revamp urgently!`;
+  }
+
+  document.getElementById('result').innerHTML = resultMsg;
 }
 
-.container {
-  background: white;
-  border-radius: 20px;
-  padding: 2rem;
-  width: 100%;
-  max-width: 700px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
-h1 {
-  font-size: 1.8rem;
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-.question {
-  margin: 1rem 0;
-  padding: 1rem;
-  border-radius: 10px;
-  background: #f0f4f8;
-}
-
-label {
-  display: block;
-  margin-top: 0.5rem;
-}
-
-button {
-  margin-top: 1rem;
-  padding: 0.8rem 1.5rem;
-  background: #6c5ce7;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 1rem;
-  width: 100%;
-}
-
-button:hover {
-  background: #5a4dcf;
-}
-
-#result {
-  margin-top: 2rem;
-  font-size: 1.3rem;
-  text-align: center;
-  font-weight: 600;
-}
-</style>
+  </script>
+</body>
+</html>

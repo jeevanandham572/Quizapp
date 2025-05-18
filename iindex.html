@@ -1,0 +1,171 @@
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gen-Z Health Score Quiz</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head><body>
+  <div class="container">
+    <h1>Health Check Quiz <span>💪</span></h1>
+    <form id="quizForm"></form>
+    <button type="button" onclick="submitQuiz()">Check My Score</button>
+    <div id="result"></div>
+  </div>  <script>
+    const questions = [
+      "Do you sleep 7–9 hours every night? 😴",
+      "Do you drink at least 2 liters of water daily? 💧",
+      "Do you engage in 150+ minutes of exercise weekly? 🏃‍♀️",
+      "Do you eat 5+ servings of fruits and vegetables daily? 🥦",
+      "Do you limit sugar to <10% of your calories? 🍰",
+      "Do you avoid tobacco products completely? 🚭",
+      "Do you limit alcohol as per guidelines? 🍷",
+      "Do you manage stress effectively? 🧘",
+      "Do you go for annual checkups? 🩺",
+      "Is your BMI within the healthy range? ⚖️",
+      "Do you brush and floss daily? 🪥",
+      "Do you get sunlight for Vitamin D? ☀️",
+      "Do you avoid highly processed foods? 🥓",
+      "Do you wear seatbelts while driving? 🚗",
+      "Are your vaccinations up to date? 💉",
+      "Do you limit screen time and take regular breaks? 💻",
+      "Do you wash hands before meals and after restroom? 🧼",
+      "Do you avoid screens before sleep? 🌙",
+      "Do you avoid sugary drinks? 🥤",
+      "Do you consume whole grains regularly? 🍚",
+      "Do you protect your ears from loud sounds? 🎧",
+      "Do you eat home-cooked meals frequently? 🍲",
+      "Do you check nutrition labels on food? 🏷️",
+      "Do you spend time in nature weekly? 🌳",
+      "Do you take breaks for mental wellness? 🧠"
+    ];
+
+    const options = [
+      ["Always", "Sometimes", "Rarely"],
+      ["Yes, daily", "Occasionally", "No"],
+      ["Yes", "Some weeks", "No"],
+      ["Yes", "Not always", "Rarely"],
+      ["Yes", "I try", "No"],
+      ["Yes", "Trying to quit", "No"],
+      ["Yes", "Sometimes more", "No"],
+      ["Yes", "Sometimes", "No"],
+      ["Yes", "Sometimes", "Never"],
+      ["Yes", "Not sure", "No"],
+      ["Yes", "Once daily", "No"],
+      ["Yes", "Not daily", "No"],
+      ["Yes", "Sometimes", "Often eat them"],
+      ["Always", "Sometimes", "Never"],
+      ["Yes", "Some pending", "No idea"],
+      ["Yes", "Rarely", "No"],
+      ["Always", "Sometimes", "Rarely"],
+      ["Yes", "Sometimes", "No"],
+      ["Never drink them", "Occasionally", "Daily"],
+      ["Yes", "Sometimes", "No"],
+      ["Yes", "Sometimes", "No"],
+      ["Yes", "Sometimes", "Rarely"],
+      ["Always", "Sometimes", "Never"],
+      ["Yes", "Sometimes", "Never"],
+      ["Yes", "Sometimes", "No"]
+    ];
+
+    const quizForm = document.getElementById('quizForm');
+
+    questions.forEach((q, i) => {
+      const div = document.createElement('div');
+      div.className = 'question';
+      let optionsHTML = '';
+      options[i].forEach((opt, idx) => {
+        optionsHTML += `<label><input type="radio" name="q${i}" value="${3 - idx}"> ${opt}</label>`;
+      });
+      div.innerHTML = `<p>${i + 1}. ${q}</p>${optionsHTML}`;
+      quizForm.appendChild(div);
+    });
+
+    function submitQuiz() {
+      const total = questions.length * 3;
+      let score = 0;
+      for (let i = 0; i < questions.length; i++) {
+        const selected = document.querySelector(`input[name=q${i}]:checked`);
+        if (!selected) {
+          alert('Please answer all questions.');
+          return;
+        }
+        score += parseInt(selected.value);
+      }
+
+      const percent = (score / total) * 100;
+      let emoji = '😐';
+      let message = "You're doing okay, but there's room to grow!";
+      if (percent >= 80) {
+        emoji = '🔥';
+        message = "Amazing! You're in great health!";
+      } else if (percent < 50) {
+        emoji = '⚠️';
+        message = "Caution! Time to focus on your health.";
+      }
+
+      document.getElementById('result').innerHTML = `
+        <p>Your Health Score: <strong>${percent.toFixed(0)}%</strong> ${emoji}</p>
+        <p>${message}</p>
+      `;
+    }
+  </script></body></html><style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+  color: #333;
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.container {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 700px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.question {
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 10px;
+  background: #f0f4f8;
+}
+
+label {
+  display: block;
+  margin-top: 0.5rem;
+}
+
+button {
+  margin-top: 1rem;
+  padding: 0.8rem 1.5rem;
+  background: #6c5ce7;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 100%;
+}
+
+button:hover {
+  background: #5a4dcf;
+}
+
+#result {
+  margin-top: 2rem;
+  font-size: 1.3rem;
+  text-align: center;
+  font-weight: 600;
+}
+</style>
