@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App Template</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .quiz-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .question {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        .option {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .option:hover {
+            background-color: #f0f0f0;
+        }
+        .option.selected {
+            background-color: #d4edda;
+        }
+        .option.correct {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        .option.incorrect {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        .explanation {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e7f5fe;
+            border-radius: 5px;
+            border-left: 4px solid #17a2b8;
+        }
+        .explanation.show {
+            display: block;
+        }
+        .explanation p {
+            margin: 5px 0;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #prev-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+        #next-btn, #submit-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        #submit-btn {
+            display: none;
+        }
+        .results {
+            display: none;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .results.show {
+            display: block;
+        }
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #28a745;
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .question-number {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #6c757d;
+        }
+        .subject-label {
+            display: inline-block;
+            padding: 3px 8px;
+            background-color: #17a2b8;
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quiz App</h1>
+    
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div class="question-number" id="question-number">Question 1 of 0</div>
+    
+    <div class="quiz-container" id="quiz-container">
+        <div class="subject-label" id="subject-label">Subject</div>
+        <div class="question" id="question">Question text goes here</div>
+        <div class="options" id="options">
+            <!-- Options will be inserted here by JavaScript -->
+        </div>
+        <div class="explanation" id="explanation">
+            <!-- Explanation will be inserted here by JavaScript -->
+        </div>
+        <div class="controls">
+            <button id="prev-btn" disabled>Previous</button>
+            <button id="next-btn">Next</button>
+            <button id="submit-btn">Submit Quiz</button>
+        </div>
+    </div>
+    
+    <div class="results" id="results">
+        <div class="score">Your Score: <span id="score">0</span>/0</div>
+        <div id="detailed-results"></div>
+        <button id="restart-btn" style="display: block; margin: 20px auto;">Restart Quiz</button>
+    </div>
+
+    <script>
+        // This is where you'll add your questions later
+        const quizData = [
+            
+  {
+    "subject": "Internal Medicine / Microbiology / Pharmacology",
+    "question": "A 45-year-old diabetic male presents with fever, productive cough with rusty sputum, and pleuritic chest pain for the past 2 days. On examination, there is bronchial breath sounds and dullness to percussion over the right lower lobe. Chest X-ray reveals consolidation in the right lower zone. Gram stain of sputum shows Gram-positive diplococci. What is the most appropriate initial antibiotic therapy?",
+    "options": [
+      "A. Amoxicillin-clavulanic acid",
+      "B. Azithromycin",
+      "C. Ceftriaxone",
+      "D. Piperacillin-tazobactam"
+    ],
+    "answer": "C",
+    "explanation": {
+      "correct": "Ceftriaxone is a third-generation cephalosporin effective against Streptococcus pneumoniae, the most common cause of community-acquired pneumonia (CAP), particularly in diabetics.",
+      "options": [
+        "Amoxicillin-clavulanic acid is useful for mild CAP but may not be sufficient for severe pneumonia in diabetics.",
+        "Azithromycin covers atypical pathogens but is less effective against typical pneumococci in severe CAP.",
+        "Ceftriaxone has excellent activity against Streptococcus pneumoniae and is preferred in hospitalized CAP.",
+        "Piperacillin-tazobactam is more suited for hospital-acquired infections or those with Pseudomonas risk."
+      ]
+    }
+  },
+  {
+    "subject": "Pathology / Pharmacology / General Medicine",
+    "question": "A 60-year-old male with a 30-year history of smoking presents with hemoptysis and weight loss. Chest CT shows a central mass in the right lung. Biopsy reveals small cell carcinoma. Which paraneoplastic syndrome is most likely associated with this tumor?",
+    "options": [
+      "A. Hypercalcemia",
+      "B. SIADH",
+      "C. Cushing's syndrome",
+      "D. Myasthenia gravis"
+    ],
+    "answer": "B",
+    "explanation": {
+      "correct": "Small cell lung carcinoma is commonly associated with paraneoplastic SIADH due to ectopic ADH production.",
+      "options": [
+        "Hypercalcemia is more commonly associated with squamous cell carcinoma due to PTHrP production.",
+        "SIADH is frequently seen in small cell lung carcinoma due to ectopic ADH production.",
+        "Cushing's syndrome can occur but is less common than SIADH in small cell lung carcinoma.",
+        "Myasthenia gravis is more associated with thymoma, not lung cancer."
+      ]
+    }
+  },
+  {
+    "subject": "Pediatrics / Microbiology / Pharmacology",
+    "question": "A 3-year-old child presents with a barking cough, inspiratory stridor, and hoarseness of voice. The symptoms worsened at night. Lateral neck X-ray reveals a steeple sign. What is the most appropriate next step in management?",
+    "options": [
+      "A. Oral azithromycin",
+      "B. Intramuscular ceftriaxone",
+      "C. Racemic epinephrine and corticosteroids",
+      "D. Nebulized salbutamol"
+    ],
+    "answer": "C",
+    "explanation": {
+      "correct": "Croup, caused by parainfluenza virus, is managed with racemic epinephrine and corticosteroids to reduce airway edema.",
+      "options": [
+        "Azithromycin is not indicated as croup is viral.",
+        "Ceftriaxone is used for bacterial infections like epiglottitis, not viral croup.",
+        "Racemic epinephrine and corticosteroids reduce airway inflammation in moderate to severe croup.",
+        "Salbutamol is used for bronchospasm, not upper airway obstruction like croup."
+      ]
+    }
+  },
+  {
+    "subject": "Obstetrics / Pharmacology / Pathology",
+    "question": "A 32-year-old primigravida at 36 weeks gestation presents with headache, visual disturbances, and elevated blood pressure of 170/110 mmHg. Urinalysis reveals 3+ proteinuria. What is the most appropriate drug to control her blood pressure?",
+    "options": [
+      "A. Labetalol",
+      "B. Enalapril",
+      "C. Nifedipine",
+      "D. Methyldopa"
+    ],
+    "answer": "A",
+    "explanation": {
+      "correct": "Labetalol is a first-line agent for severe hypertension in pregnancy due to its safety and rapid action.",
+      "options": [
+        "Labetalol is safe and effective in pregnancy, particularly in hypertensive emergencies.",
+        "Enalapril is contraindicated in pregnancy due to risk of fetal renal damage.",
+        "Nifedipine is an alternative but labetalol is preferred for IV use.",
+        "Methyldopa is used for chronic hypertension, not emergencies."
+      ]
+    }
+  },
+  {
+    "subject": "Surgery / Pathology / Radiology",
+    "question": "A 50-year-old male presents with painless jaundice, weight loss, and pruritus. On examination, there is a palpable, non-tender gallbladder. CT scan shows a mass in the head of the pancreas. What is the most likely diagnosis?",
+    "options": [
+      "A. Cholangiocarcinoma",
+      "B. Pancreatic head carcinoma",
+      "C. Gallstones",
+      "D. Hepatocellular carcinoma"
+    ],
+    "answer": "B",
+    "explanation": {
+      "correct": "Pancreatic head carcinoma commonly presents with painless jaundice and Courvoisier's sign (palpable gallbladder).",
+      "options": [
+        "Cholangiocarcinoma may cause jaundice but gallbladder is usually not palpable.",
+        "Pancreatic head carcinoma causes obstruction of the bile duct, leading to painless jaundice and palpable gallbladder.",
+        "Gallstones typically cause painful jaundice, not painless, and gallbladder is usually contracted.",
+        "Hepatocellular carcinoma does not usually present with painless jaundice and palpable gallbladder."
+      ]
+    }
+  },
+  {
+    "subject": "Dermatology / Microbiology / Pharmacology",
+    "question": "A 25-year-old man presents with multiple vesicular lesions on the genitalia associated with pain and fever. He reports similar episodes in the past. Tzanck smear from the lesion shows multinucleated giant cells. What is the most appropriate treatment?",
+    "options": [
+      "A. Fluconazole",
+      "B. Acyclovir",
+      "C. Erythromycin",
+      "D. Terbinafine"
+    ],
+    "answer": "B",
+    "explanation": {
+      "correct": "Recurrent genital herpes is treated with antiviral agents such as acyclovir.",
+      "options": [
+        "Fluconazole is an antifungal, not useful in herpes.",
+        "Acyclovir is effective against HSV, the causative agent of genital herpes.",
+        "Erythromycin is an antibiotic, not indicated here.",
+        "Terbinafine is used for dermatophyte infections, not herpes."
+      ]
+    }
+  },
+  {
+    "subject": "Psychiatry / Pharmacology / Physiology",
+    "question": "A 21-year-old student presents with episodes of intense fear, palpitations, sweating, chest pain, and a fear of dying. These episodes are sudden and last for 10–15 minutes. Cardiac workup is normal. What is the best initial pharmacological treatment?",
+    "options": [
+      "A. Haloperidol",
+      "B. Fluoxetine",
+      "C. Diazepam",
+      "D. Lithium"
+    ],
+    "answer": "B",
+    "explanation": {
+      "correct": "Panic disorder is best treated with SSRIs such as fluoxetine for long-term control.",
+      "options": [
+        "Haloperidol is an antipsychotic, not useful in panic disorder.",
+        "Fluoxetine, an SSRI, is the first-line treatment for panic disorder.",
+        "Diazepam may provide short-term relief but is not preferred due to dependency.",
+        "Lithium is used in bipolar disorder, not panic disorder."
+      ]
+    }
+  },
+  {
+    "subject": "Medicine / Endocrinology / Pharmacology",
+    "question": "A 30-year-old woman presents with weight loss, palpitations, and heat intolerance. On examination, she has exophthalmos and a diffuse goiter. Her TSH is suppressed, and T3/T4 levels are elevated. What is the first-line treatment for symptom control?",
+    "options": [
+      "A. Propylthiouracil",
+      "B. Methimazole",
+      "C. Propranolol",
+      "D. Radioactive iodine"
+    ],
+    "answer": "C",
+    "explanation": {
+      "correct": "Propranolol provides immediate symptomatic relief of adrenergic symptoms in hyperthyroidism.",
+      "options": [
+        "Propylthiouracil is used but has delayed action and more hepatotoxicity.",
+        "Methimazole is used to treat the cause but not for acute symptom control.",
+        "Propranolol blocks beta-adrenergic symptoms and also decreases peripheral T4 to T3 conversion.",
+        "Radioactive iodine is definitive therapy but not used for immediate symptom control."
+      ]
+    }
+  },
+  {
+    "subject": "Physiology / Medicine / Pathology",
+    "question": "A 65-year-old male with long-standing hypertension presents with dyspnea on exertion and orthopnea. Echocardiogram reveals reduced ejection fraction. What physiological change is most likely responsible for this condition?",
+    "options": [
+      "A. Increased preload",
+      "B. Decreased afterload",
+      "C. Decreased contractility",
+      "D. Increased heart rate"
+    ],
+    "answer": "C",
+    "explanation": {
+      "correct": "Systolic heart failure is due to decreased contractility, leading to reduced ejection fraction.",
+      "options": [
+        "Increased preload may be a consequence but not the primary cause.",
+        "Decreased afterload would improve ejection, not cause failure.",
+        "Decreased contractility due to myocardial damage leads to reduced ejection fraction.",
+        "Increased heart rate is compensatory, not causative."
+      ]
+    }
+  },
+  {
+    "subject": "Surgery / Medicine / Pharmacology",
+    "question": "A 25-year-old male with polytrauma is admitted to the ICU. On day 5, he develops fever, hypotension, and diffuse petechiae. Platelet count is 20,000/mm³. PT and aPTT are prolonged, and D-dimer is elevated. What is the most likely diagnosis?",
+    "options": [
+      "A. Thrombotic thrombocytopenic purpura",
+      "B. Immune thrombocytopenic purpura",
+      "C. Disseminated intravascular coagulation",
+      "D. Hemophilia A"
+    ],
+    "answer": "C",
+    "explanation": {
+      "correct": "DIC is a common complication of sepsis or trauma with features of thrombocytopenia, prolonged PT/aPTT, and elevated D-dimer.",
+      "options": [
+        "TTP has normal PT/aPTT and neurologic features.",
+        "ITP presents with isolated thrombocytopenia without coagulation abnormalities.",
+        "DIC shows a combination of low platelets, elevated PT/aPTT, and D-dimer.",
+        "Hemophilia A involves isolated aPTT prolongation without thrombocytopenia."
+      ]
+    }
+  }
+
+            // Template for each question:
+            /*
+            {
+                subject: "Subject Name",
+                question: "Question text?",
+                options: [
+                    "A. Option 1",
+                    "B. Option 2",
+                    "C. Option 3",
+                    "D. Option 4"
+                ],
+                answer: "A", // Correct answer letter (A, B, C, or D)
+                explanation: {
+                    correct: "Explanation for correct answer",
+                    options: [
+                        "Explanation for option A",
+                        "Explanation for option B",
+                        "Explanation for option C",
+                        "Explanation for option D"
+                    ]
+                }
+            }
+            */
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = [];
+        let quizCompleted = false;
+
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const explanationElement = document.getElementById('explanation');
+        const subjectLabelElement = document.getElementById('subject-label');
+        const questionNumberElement = document.getElementById('question-number');
+        const progressBarElement = document.getElementById('progress-bar');
+        const prevButton = document.getElementById('prev-btn');
+        const nextButton = document.getElementById('next-btn');
+        const submitButton = document.getElementById('submit-btn');
+        const resultsElement = document.getElementById('results');
+        const scoreElement = document.getElementById('score');
+        const detailedResultsElement = document.getElementById('detailed-results');
+        const restartButton = document.getElementById('restart-btn');
+        const quizContainer = document.getElementById('quiz-container');
+
+        function loadQuestion() {
+            if (quizData.length === 0) {
+                questionElement.textContent = "No questions available. Please add questions to the quizData array.";
+                optionsElement.innerHTML = "";
+                explanationElement.classList.remove('show');
+                nextButton.style.display = 'none';
+                submitButton.style.display = 'none';
+                return;
+            }
+
+            const currentQuizData = quizData[currentQuestion];
+            
+            questionNumberElement.textContent = `Question ${currentQuestion + 1} of ${quizData.length}`;
+            progressBarElement.style.width = `${((currentQuestion + 1) / quizData.length) * 100}%`;
+            
+            subjectLabelElement.textContent = currentQuizData.subject;
+            questionElement.textContent = currentQuizData.question;
+            
+            optionsElement.innerHTML = '';
+            explanationElement.classList.remove('show');
+            explanationElement.innerHTML = '';
+            
+            currentQuizData.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('option');
+                optionElement.dataset.option = String.fromCharCode(65 + index);
+                optionElement.textContent = option;
+                
+                if (userAnswers[currentQuestion] !== null && userAnswers[currentQuestion] !== undefined) {
+                    const userAnswer = userAnswers[currentQuestion];
+                    const correctAnswer = currentQuizData.answer;
+                    
+                    if (optionElement.dataset.option === correctAnswer) {
+                        optionElement.classList.add('correct');
+                    } else if (optionElement.dataset.option === userAnswer && userAnswer !== correctAnswer) {
+                        optionElement.classList.add('incorrect');
+                    }
+                    
+                    if (optionElement.dataset.option === userAnswer) {
+                        optionElement.classList.add('selected');
+                    }
+                }
+                
+                optionElement.addEventListener('click', () => selectOption(optionElement));
+                optionsElement.appendChild(optionElement);
+            });
+            
+            prevButton.disabled = currentQuestion === 0;
+            
+            if (currentQuestion === quizData.length - 1) {
+                nextButton.style.display = 'none';
+                submitButton.style.display = 'block';
+            } else {
+                nextButton.style.display = 'block';
+                submitButton.style.display = 'none';
+            }
+            
+            if (quizCompleted) {
+                showResults();
+            }
+        }
+
+        function selectOption(selectedOption) {
+            if (quizCompleted) return;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            selectedOption.classList.add('selected');
+            userAnswers[currentQuestion] = selectedOption.dataset.option;
+            
+            showExplanation();
+        }
+
+        function showExplanation() {
+            if (userAnswers[currentQuestion] === null || userAnswers[currentQuestion] === undefined) return;
+            
+            const currentQuizData = quizData[currentQuestion];
+            explanationElement.innerHTML = `
+                <p><strong>Correct Answer: ${currentQuizData.answer}. ${currentQuizData.options[currentQuizData.answer.charCodeAt(0) - 65].substring(3)}</strong></p>
+                <p><strong>Explanations:</strong></p>
+                ${currentQuizData.options.map((option, index) => {
+                    const optionLetter = String.fromCharCode(65 + index);
+                    return `<p><strong>${optionLetter}.</strong> ${currentQuizData.explanation.options[index]}</p>`;
+                }).join('')}
+            `;
+            explanationElement.classList.add('show');
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+            }
+        }
+
+        function submitQuiz() {
+            quizCompleted = true;
+            
+            score = 0;
+            quizData.forEach((question, index) => {
+                if (userAnswers[index] === question.answer) {
+                    score++;
+                }
+            });
+            
+            showResults();
+        }
+
+        function showResults() {
+            quizContainer.style.display = 'none';
+            resultsElement.classList.add('show');
+            scoreElement.textContent = `${score} / ${quizData.length}`;
+            
+            detailedResultsElement.innerHTML = '';
+            quizData.forEach((question, index) => {
+                const questionResult = document.createElement('div');
+                questionResult.style.marginBottom = '20px';
+                questionResult.style.padding = '15px';
+                questionResult.style.backgroundColor = userAnswers[index] === question.answer ? '#d4edda' : '#f8d7da';
+                questionResult.style.borderRadius = '5px';
+                
+                questionResult.innerHTML = `
+                    <p><strong>Question ${index + 1}:</strong> ${question.question}</p>
+                    <p><strong>Your answer:</strong> ${userAnswers[index] ? userAnswers[index] + '. ' + question.options[userAnswers[index].charCodeAt(0) - 65].substring(3) : 'Not answered'}</p>
+                    <p><strong>Correct answer:</strong> ${question.answer}. ${question.options[question.answer.charCodeAt(0) - 65].substring(3)}</p>
+                    <div style="background-color: #e7f5fe; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                        <p><strong>Explanation:</strong></p>
+                        ${question.explanation.options.map((exp, i) => {
+                            const optionLetter = String.fromCharCode(65 + i);
+                            return `<p><strong>${optionLetter}.</strong> ${exp}</p>`;
+                        }).join('')}
+                    </div>
+                `;
+                
+                detailedResultsElement.appendChild(questionResult);
+            });
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(quizData.length).fill(null);
+            quizCompleted = false;
+            
+            quizContainer.style.display = 'block';
+            resultsElement.classList.remove('show');
+            
+            loadQuestion();
+        }
+
+        // Initialize the quiz
+        prevButton.addEventListener('click', prevQuestion);
+        nextButton.addEventListener('click', nextQuestion);
+        submitButton.addEventListener('click', submitQuiz);
+        restartButton.addEventListener('click', restartQuiz);
+
+        // Initialize userAnswers array based on quiz length
+        userAnswers = new Array(quizData.length).fill(null);
+        loadQuestion();
+    </script>
+</body>
+</html>
