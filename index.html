@@ -16,7 +16,13 @@
     h2 {
       text-align: center;
       color: #007BFF;
-      margin-bottom: 25px;
+      margin-bottom: 10px;
+    }
+
+    .date-info {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: bold;
     }
 
     .form-section {
@@ -47,7 +53,8 @@
     }
 
     textarea {
-      height: 100px;
+      height: 150px;
+      white-space: pre-wrap;
     }
 
     .lab-list label {
@@ -74,13 +81,14 @@
 
     #output {
       width: 100%;
-      height: 250px;
+      height: 300px;
       margin-top: 20px;
       padding: 15px;
       font-size: 14px;
       background: #eef7ff;
       border-radius: 12px;
       border: 1px solid #ccc;
+      white-space: pre-wrap;
     }
 
     @media (max-width: 600px) {
@@ -97,6 +105,10 @@
 <body>
 
   <h2>FAM MED OPD Consultation Form</h2>
+  <div class="date-info">
+    Date: <span id="currentDate">(Loading...)</span>
+    <input type="hidden" id="consultDateHidden">
+  </div>
 
   <form id="consultForm">
     <div class="form-section">
@@ -115,16 +127,36 @@
     </div>
 
     <div class="form-section">
-      <h3>Past Medical History:</h3>
+      <label>Past Medical History:</label>
       <label><input type="checkbox" id="htn"> Hypertension</label>
       <label><input type="checkbox" id="dm"> Diabetes Mellitus</label>
       <label><input type="checkbox" id="tb"> Tuberculosis</label>
       <label><input type="checkbox" id="asthma"> Asthmatic</label>
+      <label>Past Surgeries / Hospital Admissions: <input type="text" id="surgery"></label>
       <label>Maintenance Medications: <input type="text" id="meds"></label>
     </div>
 
     <div class="form-section">
-      <h3>Vitals:</h3>
+      <label>Family History - Paternal Side:</label>
+      <label><input type="checkbox" id="pat-hpn"> HPN</label>
+      <label><input type="checkbox" id="pat-dm"> DM</label>
+      <label><input type="checkbox" id="pat-ba"> BA</label>
+      <label><input type="checkbox" id="pat-ptb"> PTB</label>
+      <label>Family History - Maternal Side:</label>
+      <label><input type="checkbox" id="mat-hpn"> HPN</label>
+      <label><input type="checkbox" id="mat-dm"> DM</label>
+      <label><input type="checkbox" id="mat-ba"> BA</label>
+    </div>
+
+    <div class="form-section">
+      <label>Personal and Social History:</label>
+      <label><input type="checkbox" id="smoker"> Smoker</label>
+      <label><input type="checkbox" id="alcohol"> Alcoholic Drinker</label>
+      <label><input type="checkbox" id="drugs"> Illicit Drug Use</label>
+    </div>
+
+    <div class="form-section">
+      <label>Vitals:</label>
       <label>BP: <input type="text" id="bp"></label>
       <label>HR: <input type="text" id="hr"></label>
       <label>RR: <input type="text" id="rr"></label>
@@ -134,8 +166,27 @@
       <label>Height (cm): <input type="text" id="ht"></label>
     </div>
 
+    <div class="form-section">
+      <label>Physical Examination:</label>
+      <textarea id="pe">Skin: Warm to touch, good skin turgor.
+
+HEENT: Anicteric sclerae, pink palpebral conjunctivae, (-) sunken eyeballs, patent nares, (-) alar flaring, moist lips and oral mucosa, (-) nasal/oral/ear discharges.
+
+Neck: (-) lymphadenopathy
+
+C/L: Equal chest expansion, Clear breath sound, (-) retractions
+
+CVS: Adynamic precordium, distinct heart sounds, regular rate and rhythm, (-) murmurs
+
+Abdomen: flabby, NABS, no masses no lesions, soft (-) tenderness
+
+GUT: (-) KPS
+
+Extremities: Strong peripheral pulses, CRT <2 seconds</textarea>
+    </div>
+
     <div class="form-section lab-list">
-      <h3>Labs Requested:</h3>
+      <label>Labs Requested:</label>
       <label><input type="checkbox" class="lab" value="Urinalysis"> Urinalysis</label>
       <label><input type="checkbox" class="lab" value="Sodium"> Sodium</label>
       <label><input type="checkbox" class="lab" value="Potassium"> Potassium</label>
@@ -155,31 +206,41 @@
       <label><input type="checkbox" class="lab" value="Amylase"> Amylase</label>
       <label><input type="checkbox" class="lab" value="CBC"> CBC</label>
       <label><input type="checkbox" class="lab" value="Electrophoresis"> Electrophoresis</label>
-      <label><input type="checkbox" class="lab" value="2D Echo with Doppler"> 2D Echo with Doppler</label><br><br>
+      <label><input type="checkbox" class="lab" value="2D Echo with Doppler"> 2D Echo with Doppler</label>
       <label>Other labs: <input type="text" id="otherLabs"></label>
     </div>
-
-    <button type="button" class="btn" onclick="generateText()">Generate Output</button>
   </form>
 
+  <button class="btn" type="button" onclick="generateText()">Generate Output</button>
   <textarea id="output" readonly placeholder="Your formatted note will appear here..."></textarea>
   <button class="btn" onclick="copyToClipboard()">Copy to Clipboard</button>
 
   <script>
+    function getVal(id) {
+      return document.getElementById(id).value || '';
+    }
+
+    function copyToClipboard() {
+      const textarea = document.getElementById("output");
+      textarea.select();
+      document.execCommand("copy");
+      alert("Copied to clipboard!");
+    }
+
     function generateText() {
-      const getVal = id => document.getElementById(id).value;
       const getCheck = id => document.getElementById(id).checked ? '[x]' : '[ ]';
+      const consultDate = getVal('consultDateHidden');
 
       const labChecks = document.querySelectorAll(".lab");
       let labList = "";
       labChecks.forEach(cb => {
         if (cb.checked) labList += `[x] ${cb.value}\n`;
       });
-
       const otherLabs = getVal('otherLabs');
       if (otherLabs.trim()) labList += `[ ] Other: ${otherLabs}\n`;
 
-      const output = `
+      const output = `Good Day doctors, respectfully referring you of a consult at FAM MED OPD: (${consultDate})
+
 Name: ${getVal('name')}
 Age/Sex: ${getVal('ageSex')}
 Birthday: ${getVal('birthday')}
@@ -197,31 +258,43 @@ ${getCheck('dm')} Diabetes Mellitus
 ${getCheck('tb')} Tuberculosis
 ${getCheck('asthma')} Asthmatic
 
+Past Surgery: ${getVal('surgery')}
 Maintenance Medications: ${getVal('meds')}
 
+Family History:
+Paternal: ${getCheck('pat-hpn')} HPN, ${getCheck('pat-dm')} DM, ${getCheck('pat-ba')} BA, ${getCheck('pat-ptb')} PTB
+Maternal: ${getCheck('mat-hpn')} HPN, ${getCheck('mat-dm')} DM, ${getCheck('mat-ba')} BA
+
+Personal and Social History:
+${getCheck('smoker')} Smoker, ${getCheck('alcohol')} Alcoholic Drinker, ${getCheck('drugs')} Illicit Drug Use
+
 Vitals:
-BP: ${getVal('bp')} mmHg
-HR: ${getVal('hr')} bpm
-RR: ${getVal('rr')} cpm
-Temp: ${getVal('temp')} °C
-O2 Sat: ${getVal('o2')} %
-Weight: ${getVal('wt')} kg
-Height: ${getVal('ht')} cm
+BP: ${getVal('bp')} mmHg, HR: ${getVal('hr')} bpm, RR: ${getVal('rr')} cpm
+Temp: ${getVal('temp')} °C, O2 Sat: ${getVal('o2')} %, Weight: ${getVal('wt')} kg, Height: ${getVal('ht')} cm
+
+Physical Examination:
+${getVal('pe')}
 
 Labs Requested:
-${labList}
-`;
+${labList}`;
 
       document.getElementById("output").value = output.trim();
     }
 
-    function copyToClipboard() {
-      const textarea = document.getElementById("output");
-      textarea.select();
-      document.execCommand("copy");
-      alert("Copied to clipboard!");
-    }
+    // Fetch current date online
+    window.addEventListener('DOMContentLoaded', () => {
+      fetch("https://worldtimeapi.org/api/ip")
+        .then(res => res.json())
+        .then(data => {
+          const date = new Date(data.datetime);
+          const formatted = date.toISOString().split('T')[0];
+          document.getElementById("currentDate").textContent = formatted;
+          document.getElementById("consultDateHidden").value = formatted;
+        })
+        .catch(() => {
+          document.getElementById("currentDate").textContent = "Unavailable";
+        });
+    });
   </script>
-
 </body>
 </html>
