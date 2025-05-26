@@ -1,156 +1,227 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Full Diet Score Analyzer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <title>FAM MED OPD Consult Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to right, #f9d423, #ff4e50);
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      padding: 2rem;
+      padding: 20px;
+      background: #f4f9ff;
       color: #333;
     }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 2rem;
-      border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    }
-    h1 {
+
+    h2 {
       text-align: center;
-      font-size: 2rem;
-      margin-bottom: 1rem;
+      color: #007BFF;
+      margin-bottom: 25px;
     }
-    .question {
-      margin-bottom: 1.5rem;
-      background: #f7f7f7;
-      padding: 1rem;
-      border-radius: 10px;
+
+    .form-section {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 25px;
     }
-    .question p {
-      font-weight: bold;
-    }
+
     label {
       display: block;
-      margin: 0.3rem 0;
+      margin-top: 10px;
+      font-weight: 500;
+      color: #333;
     }
-    button {
-      background: #27ae60;
+
+    input[type="text"],
+    input[type="date"],
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      margin-top: 4px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    textarea {
+      height: 100px;
+    }
+
+    .lab-list label {
+      display: block;
+      margin: 5px 0;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 12px 24px;
+      background-color: #007BFF;
       color: white;
       border: none;
-      padding: 1rem;
-      width: 100%;
-      font-size: 1rem;
-      border-radius: 10px;
+      border-radius: 12px;
+      font-size: 16px;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
-    button:hover {
-      background: #219150;
+
+    .btn:hover {
+      background-color: #0056b3;
     }
-    #result {
-      text-align: center;
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-top: 2rem;
+
+    #output {
+      width: 100%;
+      height: 250px;
+      margin-top: 20px;
+      padding: 15px;
+      font-size: 14px;
+      background: #eef7ff;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+    }
+
+    @media (max-width: 600px) {
+      h2 {
+        font-size: 20px;
+      }
+
+      .btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Diet Score Analyzer Quiz 🥗</h1>
-    <form id="dietForm"></form>
-    <button onclick="calculateDietScore()">Submit & Calculate Score</button>
-    <div id="result"></div>
-  </div>
+
+  <h2>FAM MED OPD Consultation Form</h2>
+
+  <form id="consultForm">
+    <div class="form-section">
+      <label>Patient Name: <input type="text" id="name"></label>
+      <label>Age/Sex: <input type="text" id="ageSex"></label>
+      <label>Birthday: <input type="date" id="birthday"></label>
+      <label>Status: <input type="text" id="status"></label>
+      <label>Address: <input type="text" id="address"></label>
+      <label>Contact #: <input type="text" id="contact"></label>
+      <label>Occupation: <input type="text" id="occupation"></label>
+    </div>
+
+    <div class="form-section">
+      <label>Chief Complaint: <input type="text" id="cc"></label>
+      <label>HPI: <textarea id="hpi"></textarea></label>
+    </div>
+
+    <div class="form-section">
+      <h3>Past Medical History:</h3>
+      <label><input type="checkbox" id="htn"> Hypertension</label>
+      <label><input type="checkbox" id="dm"> Diabetes Mellitus</label>
+      <label><input type="checkbox" id="tb"> Tuberculosis</label>
+      <label><input type="checkbox" id="asthma"> Asthmatic</label>
+      <label>Maintenance Medications: <input type="text" id="meds"></label>
+    </div>
+
+    <div class="form-section">
+      <h3>Vitals:</h3>
+      <label>BP: <input type="text" id="bp"></label>
+      <label>HR: <input type="text" id="hr"></label>
+      <label>RR: <input type="text" id="rr"></label>
+      <label>Temp: <input type="text" id="temp"></label>
+      <label>O2 Sat: <input type="text" id="o2"></label>
+      <label>Weight (kg): <input type="text" id="wt"></label>
+      <label>Height (cm): <input type="text" id="ht"></label>
+    </div>
+
+    <div class="form-section lab-list">
+      <h3>Labs Requested:</h3>
+      <label><input type="checkbox" class="lab" value="Urinalysis"> Urinalysis</label>
+      <label><input type="checkbox" class="lab" value="Sodium"> Sodium</label>
+      <label><input type="checkbox" class="lab" value="Potassium"> Potassium</label>
+      <label><input type="checkbox" class="lab" value="Chloride"> Chloride</label>
+      <label><input type="checkbox" class="lab" value="Ionized Calcium"> Ionized Calcium</label>
+      <label><input type="checkbox" class="lab" value="FBS"> FBS</label>
+      <label><input type="checkbox" class="lab" value="BUN"> BUN</label>
+      <label><input type="checkbox" class="lab" value="Creatinine"> Creatinine</label>
+      <label><input type="checkbox" class="lab" value="Blood Uric Acid"> Blood Uric Acid</label>
+      <label><input type="checkbox" class="lab" value="Total Cholesterol"> Total Cholesterol</label>
+      <label><input type="checkbox" class="lab" value="Triglycerides"> Triglycerides</label>
+      <label><input type="checkbox" class="lab" value="HDL Cholesterol"> HDL Cholesterol</label>
+      <label><input type="checkbox" class="lab" value="LDL Cholesterol"> LDL Cholesterol</label>
+      <label><input type="checkbox" class="lab" value="SGOT/AST"> SGOT/AST</label>
+      <label><input type="checkbox" class="lab" value="SGPT/ALT"> SGPT/ALT</label>
+      <label><input type="checkbox" class="lab" value="Lipase"> Lipase</label>
+      <label><input type="checkbox" class="lab" value="Amylase"> Amylase</label>
+      <label><input type="checkbox" class="lab" value="CBC"> CBC</label>
+      <label><input type="checkbox" class="lab" value="Electrophoresis"> Electrophoresis</label>
+      <label><input type="checkbox" class="lab" value="2D Echo with Doppler"> 2D Echo with Doppler</label><br><br>
+      <label>Other labs: <input type="text" id="otherLabs"></label>
+    </div>
+
+    <button type="button" class="btn" onclick="generateText()">Generate Output</button>
+  </form>
+
+  <textarea id="output" readonly placeholder="Your formatted note will appear here..."></textarea>
+  <button class="btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+
   <script>
-    const questions = [
-      "How many servings of fruits & vegetables do you eat daily?",
-      "What type of grains do you usually eat?",
-      "How often do you eat fast food/fried foods?",
-      "How many sugary drinks do you consume weekly?",
-      "How often do you eat processed meats?",
-      "What kind of oil/fat do you primarily use for cooking?",
-      "How often do you consume legumes, beans, or pulses?",
-      "What kind of snacks do you usually choose?",
-      "How many glasses of water do you drink per day?",
-      "Do you eat breakfast every day?",
-      "What is your protein intake source?",
-      "How much salt do you consume?",
-      "How often do you eat out or order food?",
-      "Do you eat mindfully and stop when full?",
-      "What best describes your meal composition?",
-      "How often do you eat fermented foods?",
-      "Do you limit ultra-processed foods?",
-      "Do you track your calories/macros or follow dietary guidelines?",
-      "What portion size do you usually consume?",
-      "Do you feel bloated or sluggish after meals?"
-    ];const options = [
-  ["a) 6 or more", "b) 4–5", "c) 2–3", "d) 1", "e) None"],
-  ["a) 100% whole grains", "b) Mostly whole grains", "c) Half-half", "d) Mostly refined", "e) Only refined"],
-  ["a) Never", "b) Once a month", "c) 1–2x/week", "d) 3–4x/week", "e) Daily"],
-  ["a) None", "b) 1–2", "c) 3–4", "d) 5–6", "e) Daily"],
-  ["a) Never", "b) 1–2x/month", "c) Once/week", "d) Few times/week", "e) Daily"],
-  ["a) Olive oil", "b) Canola/sunflower", "c) Mixed oils", "d) Butter/ghee", "e) Hydrogenated oil"],
-  ["a) Daily", "b) 4–5x/week", "c) 2–3x/week", "d) Once/week", "e) Rarely"],
-  ["a) Fruits/nuts", "b) Roasted snacks", "c) Baked snacks", "d) Chips/cookies", "e) Fried junk"],
-  ["a) 10+ glasses", "b) 8–10", "c) 6–7", "d) 4–5", "e) <4"],
-  ["a) Always", "b) 5–6x/week", "c) 3–4x/week", "d) 1–2x/week", "e) Never"],
-  ["a) Lean/plant based", "b) Mostly vegetarian", "c) Mixed", "d) Low protein", "e) High-fat meats"],
-  ["a) Low/no extra", "b) Normal", "c) Add a little", "d) Add every meal", "e) Very salty"],
-  ["a) 1–2/month", "b) Weekly", "c) 2–3x/week", "d) 4–5x/week", "e) Daily"],
-  ["a) Always", "b) Mostly", "c) Sometimes", "d) Rarely", "e) Never"],
-  ["a) Balanced", "b) Mostly balanced", "c) Sometimes", "d) Often unbalanced", "e) Unhealthy"],
-  ["a) Daily", "b) 4–5x/week", "c) 2–3x/week", "d) Occasionally", "e) Never"],
-  ["a) Avoid completely", "b) Rarely", "c) Occasionally", "d) Often", "e) Regularly"],
-  ["a) Yes, strictly", "b) Mostly", "c) Sometimes", "d) Rarely", "e) Never"],
-  ["a) Controlled", "b) Moderate", "c) Sometimes large", "d) Often large", "e) Always large"],
-  ["a) Never", "b) Rarely", "c) Sometimes", "d) Often", "e) Almost always"]
-];
+    function generateText() {
+      const getVal = id => document.getElementById(id).value;
+      const getCheck = id => document.getElementById(id).checked ? '[x]' : '[ ]';
 
-const form = document.getElementById('dietForm');
-questions.forEach((q, i) => {
-  const div = document.createElement('div');
-  div.className = 'question';
-  let html = `<p>${i + 1}. ${q}</p>`;
-  options[i].forEach((opt, j) => {
-    html += `<label><input type="radio" name="q${i}" value="${5 - j}" required> ${opt}</label>`;
-  });
-  div.innerHTML = html;
-  form.appendChild(div);
-});
+      const labChecks = document.querySelectorAll(".lab");
+      let labList = "";
+      labChecks.forEach(cb => {
+        if (cb.checked) labList += `[x] ${cb.value}\n`;
+      });
 
-function calculateDietScore() {
-  event.preventDefault();
-  let score = 0;
-  for (let i = 0; i < questions.length; i++) {
-    const selected = document.querySelector(`input[name=q${i}]:checked`);
-    if (!selected) {
-      alert('Please answer all questions.');
-      return;
+      const otherLabs = getVal('otherLabs');
+      if (otherLabs.trim()) labList += `[ ] Other: ${otherLabs}\n`;
+
+      const output = `
+Name: ${getVal('name')}
+Age/Sex: ${getVal('ageSex')}
+Birthday: ${getVal('birthday')}
+Status: ${getVal('status')}
+Address: ${getVal('address')}
+Contact: ${getVal('contact')}
+Occupation: ${getVal('occupation')}
+
+CC: ${getVal('cc')}
+HPI: ${getVal('hpi')}
+
+Past Medical History:
+${getCheck('htn')} Hypertension
+${getCheck('dm')} Diabetes Mellitus
+${getCheck('tb')} Tuberculosis
+${getCheck('asthma')} Asthmatic
+
+Maintenance Medications: ${getVal('meds')}
+
+Vitals:
+BP: ${getVal('bp')} mmHg
+HR: ${getVal('hr')} bpm
+RR: ${getVal('rr')} cpm
+Temp: ${getVal('temp')} °C
+O2 Sat: ${getVal('o2')} %
+Weight: ${getVal('wt')} kg
+Height: ${getVal('ht')} cm
+
+Labs Requested:
+${labList}
+`;
+
+      document.getElementById("output").value = output.trim();
     }
-    score += parseInt(selected.value);
-  }
 
-  let resultMsg = "";
-  if (score >= 90) {
-    resultMsg = `Your Score: ${score}/100 🌟<br>Excellent diet! Keep it up!`;
-  } else if (score >= 75) {
-    resultMsg = `Your Score: ${score}/100 👍<br>Very good, just minor improvements needed.`;
-  } else if (score >= 55) {
-    resultMsg = `Your Score: ${score}/100 ⚖️<br>Moderate — work on improving your habits.`;
-  } else if (score >= 35) {
-    resultMsg = `Your Score: ${score}/100 ⚠️<br>Poor diet — time to make healthy changes.`;
-  } else {
-    resultMsg = `Your Score: ${score}/100 🚨<br>Very unhealthy diet. Revamp urgently!`;
-  }
-
-  document.getElementById('result').innerHTML = resultMsg;
-}
-
+    function copyToClipboard() {
+      const textarea = document.getElementById("output");
+      textarea.select();
+      document.execCommand("copy");
+      alert("Copied to clipboard!");
+    }
   </script>
+
 </body>
 </html>
