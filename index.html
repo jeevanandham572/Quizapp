@@ -1,300 +1,180 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>FAM MED OPD Consult Form</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>🎓 15-Day Study Tracker</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #f9f7f7, #dbe2ef);
       margin: 0;
       padding: 20px;
-      background: #f4f9ff;
-      color: #333;
+      color: #222;
     }
-
+    h1 {
+      text-align: center;
+      color: #112d4e;
+    }
     h2 {
-      text-align: center;
-      color: #007BFF;
-      margin-bottom: 10px;
-    }
-
-    .date-info {
-      text-align: center;
-      margin-bottom: 20px;
-      font-weight: bold;
-    }
-
-    .form-section {
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      padding: 20px;
-      margin-bottom: 25px;
-    }
-
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: 500;
-      color: #333;
-    }
-
-    input[type="text"],
-    input[type="date"],
-    textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 12px;
-      margin-top: 4px;
-      box-sizing: border-box;
-      font-size: 14px;
-    }
-
-    textarea {
-      height: 150px;
-      white-space: pre-wrap;
-    }
-
-    .lab-list label {
-      display: block;
-      margin: 5px 0;
-    }
-
-    .btn {
-      display: inline-block;
-      margin-top: 15px;
-      padding: 12px 24px;
-      background-color: #007BFF;
+      background-color: #3f72af;
       color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 30px;
     }
-
-    .btn:hover {
-      background-color: #0056b3;
+    ul {
+      list-style: none;
+      padding-left: 0;
     }
-
-    #output {
+    li {
+      background: white;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+    }
+    input[type="checkbox"] {
+      margin-right: 10px;
+      transform: scale(1.3);
+    }
+    .progress-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .progress-bar {
       width: 100%;
-      height: 300px;
-      margin-top: 20px;
-      padding: 15px;
-      font-size: 14px;
-      background: #eef7ff;
-      border-radius: 12px;
-      border: 1px solid #ccc;
-      white-space: pre-wrap;
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
     }
-
-    @media (max-width: 600px) {
-      h2 {
-        font-size: 20px;
-      }
-
-      .btn {
-        width: 100%;
-      }
+    .progress-bar-fill {
+      height: 25px;
+      background: linear-gradient(to right, #00b894, #00cec9);
+      width: 0%;
+      color: white;
+      line-height: 25px;
+      text-align: center;
+      transition: width 0.4s ease-in-out;
     }
   </style>
 </head>
 <body>
 
-  <h2>FAM MED OPD Consultation Form</h2>
-  <div class="date-info">
-    Date: <span id="currentDate">(Loading...)</span>
-    <input type="hidden" id="consultDateHidden">
+  <h1>📘 15-Day Study Progress Tracker</h1>
+
+  <div class="progress-container">
+    <div class="progress-bar">
+      <div class="progress-bar-fill" id="progress-bar">0%</div>
+    </div>
+    <p><strong id="completed">0</strong> out of <strong id="total">0</strong> videos completed</p>
   </div>
 
-  <form id="consultForm">
-    <div class="form-section">
-      <label>Patient Name: <input type="text" id="name"></label>
-      <label>Age/Sex: <input type="text" id="ageSex"></label>
-      <label>Birthday: <input type="date" id="birthday"></label>
-      <label>Status: <input type="text" id="status"></label>
-      <label>Address: <input type="text" id="address"></label>
-      <label>Contact #: <input type="text" id="contact"></label>
-      <label>Occupation: <input type="text" id="occupation"></label>
-    </div>
-
-    <div class="form-section">
-      <label>Chief Complaint: <input type="text" id="cc"></label>
-      <label>HPI: <textarea id="hpi"></textarea></label>
-    </div>
-
-    <div class="form-section">
-      <label>Past Medical History:</label>
-      <label><input type="checkbox" id="htn"> Hypertension</label>
-      <label><input type="checkbox" id="dm"> Diabetes Mellitus</label>
-      <label><input type="checkbox" id="tb"> Tuberculosis</label>
-      <label><input type="checkbox" id="asthma"> Asthmatic</label>
-      <label>Past Surgeries / Hospital Admissions: <input type="text" id="surgery"></label>
-      <label>Maintenance Medications: <input type="text" id="meds"></label>
-    </div>
-
-    <div class="form-section">
-      <label>Family History - Paternal Side:</label>
-      <label><input type="checkbox" id="pat-hpn"> HPN</label>
-      <label><input type="checkbox" id="pat-dm"> DM</label>
-      <label><input type="checkbox" id="pat-ba"> BA</label>
-      <label><input type="checkbox" id="pat-ptb"> PTB</label>
-      <label>Family History - Maternal Side:</label>
-      <label><input type="checkbox" id="mat-hpn"> HPN</label>
-      <label><input type="checkbox" id="mat-dm"> DM</label>
-      <label><input type="checkbox" id="mat-ba"> BA</label>
-    </div>
-
-    <div class="form-section">
-      <label>Personal and Social History:</label>
-      <label><input type="checkbox" id="smoker"> Smoker</label>
-      <label><input type="checkbox" id="alcohol"> Alcoholic Drinker</label>
-      <label><input type="checkbox" id="drugs"> Illicit Drug Use</label>
-    </div>
-
-    <div class="form-section">
-      <label>Vitals:</label>
-      <label>BP: <input type="text" id="bp"></label>
-      <label>HR: <input type="text" id="hr"></label>
-      <label>RR: <input type="text" id="rr"></label>
-      <label>Temp: <input type="text" id="temp"></label>
-      <label>O2 Sat: <input type="text" id="o2"></label>
-      <label>Weight (kg): <input type="text" id="wt"></label>
-      <label>Height (cm): <input type="text" id="ht"></label>
-    </div>
-
-    <div class="form-section">
-      <label>Physical Examination:</label>
-      <textarea id="pe">Skin: Warm to touch, good skin turgor.
-
-HEENT: Anicteric sclerae, pink palpebral conjunctivae, (-) sunken eyeballs, patent nares, (-) alar flaring, moist lips and oral mucosa, (-) nasal/oral/ear discharges.
-
-Neck: (-) lymphadenopathy
-
-C/L: Equal chest expansion, Clear breath sound, (-) retractions
-
-CVS: Adynamic precordium, distinct heart sounds, regular rate and rhythm, (-) murmurs
-
-Abdomen: flabby, NABS, no masses no lesions, soft (-) tenderness
-
-GUT: (-) KPS
-
-Extremities: Strong peripheral pulses, CRT <2 seconds</textarea>
-    </div>
-
-    <div class="form-section lab-list">
-      <label>Labs Requested:</label>
-      <label><input type="checkbox" class="lab" value="Urinalysis"> Urinalysis</label>
-      <label><input type="checkbox" class="lab" value="Sodium"> Sodium</label>
-      <label><input type="checkbox" class="lab" value="Potassium"> Potassium</label>
-      <label><input type="checkbox" class="lab" value="Chloride"> Chloride</label>
-      <label><input type="checkbox" class="lab" value="Ionized Calcium"> Ionized Calcium</label>
-      <label><input type="checkbox" class="lab" value="FBS"> FBS</label>
-      <label><input type="checkbox" class="lab" value="BUN"> BUN</label>
-      <label><input type="checkbox" class="lab" value="Creatinine"> Creatinine</label>
-      <label><input type="checkbox" class="lab" value="Blood Uric Acid"> Blood Uric Acid</label>
-      <label><input type="checkbox" class="lab" value="Total Cholesterol"> Total Cholesterol</label>
-      <label><input type="checkbox" class="lab" value="Triglycerides"> Triglycerides</label>
-      <label><input type="checkbox" class="lab" value="HDL Cholesterol"> HDL Cholesterol</label>
-      <label><input type="checkbox" class="lab" value="LDL Cholesterol"> LDL Cholesterol</label>
-      <label><input type="checkbox" class="lab" value="SGOT/AST"> SGOT/AST</label>
-      <label><input type="checkbox" class="lab" value="SGPT/ALT"> SGPT/ALT</label>
-      <label><input type="checkbox" class="lab" value="Lipase"> Lipase</label>
-      <label><input type="checkbox" class="lab" value="Amylase"> Amylase</label>
-      <label><input type="checkbox" class="lab" value="CBC"> CBC</label>
-      <label><input type="checkbox" class="lab" value="Electrophoresis"> Electrophoresis</label>
-      <label><input type="checkbox" class="lab" value="2D Echo with Doppler"> 2D Echo with Doppler</label>
-      <label>Other labs: <input type="text" id="otherLabs"></label>
-    </div>
-  </form>
-
-  <button class="btn" type="button" onclick="generateText()">Generate Output</button>
-  <textarea id="output" readonly placeholder="Your formatted note will appear here..."></textarea>
-  <button class="btn" onclick="copyToClipboard()">Copy to Clipboard</button>
-
-  <script>
-    function getVal(id) {
-      return document.getElementById(id).value || '';
-    }
-
-    function copyToClipboard() {
-      const textarea = document.getElementById("output");
-      textarea.select();
-      document.execCommand("copy");
-      alert("Copied to clipboard!");
-    }
-
-    function generateText() {
-      const getCheck = id => document.getElementById(id).checked ? '[x]' : '[ ]';
-      const consultDate = getVal('consultDateHidden');
-
-      const labChecks = document.querySelectorAll(".lab");
-      let labList = "";
-      labChecks.forEach(cb => {
-        if (cb.checked) labList += `[x] ${cb.value}\n`;
-      });
-      const otherLabs = getVal('otherLabs');
-      if (otherLabs.trim()) labList += `[ ] Other: ${otherLabs}\n`;
-
-      const output = `Good Day doctors, respectfully referring you of a consult at FAM MED OPD: (${consultDate})
-
-Name: ${getVal('name')}
-Age/Sex: ${getVal('ageSex')}
-Birthday: ${getVal('birthday')}
-Status: ${getVal('status')}
-Address: ${getVal('address')}
-Contact: ${getVal('contact')}
-Occupation: ${getVal('occupation')}
-
-CC: ${getVal('cc')}
-HPI: ${getVal('hpi')}
-
-Past Medical History:
-${getCheck('htn')} Hypertension
-${getCheck('dm')} Diabetes Mellitus
-${getCheck('tb')} Tuberculosis
-${getCheck('asthma')} Asthmatic
-
-Past Surgery: ${getVal('surgery')}
-Maintenance Medications: ${getVal('meds')}
-
-Family History:
-Paternal: ${getCheck('pat-hpn')} HPN, ${getCheck('pat-dm')} DM, ${getCheck('pat-ba')} BA, ${getCheck('pat-ptb')} PTB
-Maternal: ${getCheck('mat-hpn')} HPN, ${getCheck('mat-dm')} DM, ${getCheck('mat-ba')} BA
-
-Personal and Social History:
-${getCheck('smoker')} Smoker, ${getCheck('alcohol')} Alcoholic Drinker, ${getCheck('drugs')} Illicit Drug Use
-
-Vitals:
-BP: ${getVal('bp')} mmHg, HR: ${getVal('hr')} bpm, RR: ${getVal('rr')} cpm
-Temp: ${getVal('temp')} °C, O2 Sat: ${getVal('o2')} %, Weight: ${getVal('wt')} kg, Height: ${getVal('ht')} cm
-
-Physical Examination:
-${getVal('pe')}
-
-Labs Requested:
-${labList}`;
-
-      document.getElementById("output").value = output.trim();
-    }
-
-    // Fetch current date online
-    window.addEventListener('DOMContentLoaded', () => {
-      fetch("https://worldtimeapi.org/api/ip")
-        .then(res => res.json())
-        .then(data => {
-          const date = new Date(data.datetime);
-          const formatted = date.toISOString().split('T')[0];
-          document.getElementById("currentDate").textContent = formatted;
-          document.getElementById("consultDateHidden").value = formatted;
-        })
-        .catch(() => {
-          document.getElementById("currentDate").textContent = "Unavailable";
-        });
-    });
-  </script>
-</body>
-</html>
+  <body><h1>15-Day Study Schedule</h1>
+<h2>Day 1</h2><ul>
+<li><input data-index="0" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>1.</strong> - [Pathology] Cell Injury (119 min) | <em>Cumulative: 119 min</em></li>
+<li><input data-index="1" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>2.</strong> - [Pathology] Newer Cell Deaths (54 min) | <em>Cumulative: 173 min</em></li>
+<li><input data-index="2" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>3.</strong> - [Pathology] Intracellular Accumulations (64 min) | <em>Cumulative: 237 min</em></li>
+<li><input data-index="3" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>4.</strong> - [Pathology] Autophagy and Free Radical Injury (61 min) | <em>Cumulative: 298 min</em></li>
+<li><input data-index="4" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>5.</strong> - [Pathology] Acute Inflammation (106 min) | <em>Cumulative: 404 min</em></li>
+<li><input data-index="5" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>6.</strong> - [Pathology] Inflammation Mediators (99 min) | <em>Cumulative: 503 min</em></li>
+<li><input data-index="6" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>7.</strong> - [Pathology] Chronic Inflammation, Granuloma and Wound Healing (77 min) | <em>Cumulative: 580 min</em></li>
+<li><input data-index="7" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>8.</strong> - [Pathology] Genetics Introduction and Mendelian Disorders (146 min) | <em>Cumulative: 726 min</em></li>
+</ul>
+<h2>Day 2</h2><ul>
+<li><input data-index="8" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>9.</strong> - [Pathology] Non Mendelian and Chromosomal Disorders (125 min) | <em>Cumulative: 851 min</em></li>
+<li><input data-index="9" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>10.</strong> - [Pathology] Diagnosis of Genetic Disorders (60 min) | <em>Cumulative: 911 min</em></li>
+<li><input data-index="10" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>11.</strong> - [Pathology] Miscellaneous Concepts in Genetics (33 min) | <em>Cumulative: 944 min</em></li>
+<li><input data-index="11" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>12.</strong> - [Pathology] Classification of Neoplasia (29 min) | <em>Cumulative: 973 min</em></li>
+<li><input data-index="12" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>13.</strong> - [Pathology] Features of Neoplasia (56 min) | <em>Cumulative: 1029 min</em></li>
+<li><input data-index="13" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>14.</strong> - [Pathology] Fundamentals of Neoplasia Part 1 (53 min) | <em>Cumulative: 1082 min</em></li>
+<li><input data-index="14" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>15.</strong> - [Pathology] Fundamentals of Neoplasia Part 2 (83 min) | <em>Cumulative: 1165 min</em></li>
+<li><input data-index="15" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>16.</strong> - [Pathology] Etiology of Neoplasia (52 min) | <em>Cumulative: 1217 min</em></li>
+<li><input data-index="16" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>17.</strong> - [Pathology] Diagnosis of Tumors and Paraneoplastic Syndrome (73 min) | <em>Cumulative: 1290 min</em></li>
+<li><input data-index="17" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>18.</strong> - [Pathology] Types of Immunity (80 min) | <em>Cumulative: 1370 min</em></li>
+<li><input data-index="18" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>19.</strong> - [Pathology] Types of Hypersensitivity Reactions (47 min) | <em>Cumulative: 1417 min</em></li>
+<li><input data-index="19" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>20.</strong> - [Pathology] Tolerance and Autoimmune Disorders (70 min) | <em>Cumulative: 1487 min</em></li>
+</ul>
+<h2>Day 3</h2><ul>
+<li><input data-index="20" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>21.</strong> - [Pathology] Immunodeficiency Disorders (44 min) | <em>Cumulative: 1531 min</em></li>
+<li><input data-index="21" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>22.</strong> - [Pathology] Transplant Immunology (50 min) | <em>Cumulative: 1581 min</em></li>
+<li><input data-index="22" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>23.</strong> - [Pathology] Amyloidosis (35 min) | <em>Cumulative: 1616 min</em></li>
+<li><input data-index="23" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>24.</strong> - [Pathology] Vasculitis (72 min) | <em>Cumulative: 1688 min</em></li>
+<li><input data-index="24" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>25.</strong> - [Pathology] Sclerosis and Vascular Tumors (60 min) | <em>Cumulative: 1748 min</em></li>
+<li><input data-index="25" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>26.</strong> - [Pathology] Ischemic Heart Diseases And Myocardial Infarction (53 min) | <em>Cumulative: 1801 min</em></li>
+<li><input data-index="26" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>27.</strong> - [Pathology] Infective Endocarditis and Rheumatic Heart Disease (39 min) | <em>Cumulative: 1840 min</em></li>
+<li><input data-index="27" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>28.</strong> - [Pathology] Cardiomyopathy and Cardiac Tumors (32 min) | <em>Cumulative: 1872 min</em></li>
+<li><input data-index="28" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>29.</strong> - [Pathology] Obstructive Lung Disease (62 min) | <em>Cumulative: 1934 min</em></li>
+<li><input data-index="29" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>30.</strong> - [Pathology] Restrictive Lung Disease (47 min) | <em>Cumulative: 1981 min</em></li>
+<li><input data-index="30" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>31.</strong> - [Pathology] Pulmonary Infections (34 min) | <em>Cumulative: 2015 min</em></li>
+<li><input data-index="31" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>32.</strong> - [Pathology] Pulmonary Hypertension &amp; Lung Tumors (78 min) | <em>Cumulative: 2093 min</em></li>
+<li><input data-index="32" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>33.</strong> - [Pathology] Barrett's Esophagus/Plummer Vinson Syndrome/Esophageal Tumors (65 min) | <em>Cumulative: 2158 min</em></li>
+<li><input data-index="33" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>34.</strong> - [Pathology] Peptic Ulcer Disease/Gastric Polyps &amp; Tumors (77 min) | <em>Cumulative: 2235 min</em></li>
+</ul>
+<h2>Day 4</h2><ul>
+<li><input data-index="34" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>35.</strong> - [Pathology] Malabsorption Syndrome/Celiac Disease/Inflammatory Bowel Disease (70 min) | <em>Cumulative: 2305 min</em></li>
+<li><input data-index="35" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>36.</strong> - [Pathology] Polyps and Intestinal Carcinoma (67 min) | <em>Cumulative: 2372 min</em></li>
+<li><input data-index="36" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>37.</strong> - [Pathology] Salivary Gland Pathology (32 min) | <em>Cumulative: 2404 min</em></li>
+<li><input data-index="37" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>38.</strong> - [Pathology] Hepatobiliary Pathology (36 min) | <em>Cumulative: 2440 min</em></li>
+<li><input data-index="38" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>39.</strong> - [Pathology] Liver Cirrhosis, Tumors and Miscellaneous Topics (94 min) | <em>Cumulative: 2534 min</em></li>
+<li><input data-index="39" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>40.</strong> - [Pathology] Introduction and Cystic Diseases of Kidney (50 min) | <em>Cumulative: 2584 min</em></li>
+<li><input data-index="40" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>41.</strong> - [Pathology] Crystals and Casts (26 min) | <em>Cumulative: 2610 min</em></li>
+<li><input data-index="41" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>42.</strong> - [Pathology] Glomerular Renal Diseases (131 min) | <em>Cumulative: 2741 min</em></li>
+<li><input data-index="42" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>43.</strong> - [Pathology] Renal Tumors (55 min) | <em>Cumulative: 2796 min</em></li>
+<li><input data-index="43" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>44.</strong> - [Pathology] Vulva, Vagina and Cervix Pathology (58 min) | <em>Cumulative: 2854 min</em></li>
+<li><input data-index="44" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>45.</strong> - [Pathology] Endometrium and Gestational Trophoblastic Tumors (134 min) | <em>Cumulative: 2988 min</em></li>
+</ul>
+<h2>Day 5</h2><ul>
+<li><input data-index="45" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>46.</strong> - [Pathology] Pathology of Male Genital Tract (74 min) | <em>Cumulative: 3062 min</em></li>
+<li><input data-index="46" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>47.</strong> - [Pathology] Breast Pathology (39 min) | <em>Cumulative: 3101 min</em></li>
+<li><input data-index="47" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>48.</strong> - [Pathology] Breast Tumors (85 min) | <em>Cumulative: 3186 min</em></li>
+<li><input data-index="48" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>49.</strong> - [Pathology] Basics of Central Nervous System (55 min) | <em>Cumulative: 3241 min</em></li>
+<li><input data-index="49" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>50.</strong> - [Pathology] Brain Tumors (77 min) | <em>Cumulative: 3318 min</em></li>
+<li><input data-index="50" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>51.</strong> - [Pathology] Thyroid Gland &amp; Tumor Pathology (72 min) | <em>Cumulative: 3390 min</em></li>
+<li><input data-index="51" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>52.</strong> - [Pathology] Parathyroid, Adrenal &amp; Pituitary Gland (62 min) | <em>Cumulative: 3452 min</em></li>
+<li><input data-index="52" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>53.</strong> - [Pathology] Bone and Soft Tissue Pathology (111 min) | <em>Cumulative: 3563 min</em></li>
+<li><input data-index="53" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>54.</strong> - [Pathology] Skin Pathology (86 min) | <em>Cumulative: 3649 min</em></li>
+<li><input data-index="54" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>55.</strong> - [Pathology] Introduction to Hematology (77 min) | <em>Cumulative: 3726 min</em></li>
+</ul>
+<h2>Day 6</h2><ul>
+<li><input data-index="55" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>56.</strong> - [Pathology] Microcytic Hypochromic Anaemia (70 min) | <em>Cumulative: 3796 min</em></li>
+<li><input data-index="56" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>57.</strong> - [Pathology] Macrocytic Hypochromic Anaemia (34 min) | <em>Cumulative: 3830 min</em></li>
+<li><input data-index="57" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>58.</strong> - [Pathology] Hemolytic Anemias (90 min) | <em>Cumulative: 3920 min</em></li>
+<li><input data-index="58" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>59.</strong> - [Pathology] Sickle Cell Anemia and Thalassemia (69 min) | <em>Cumulative: 3989 min</em></li>
+<li><input data-index="59" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>60.</strong> - [Pathology] Auto Immune Hemolytic Anemia (25 min) | <em>Cumulative: 4014 min</em></li>
+<li><input data-index="60" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>61.</strong> - [Pathology] RBC Shapes and Inclusions (12 min) | <em>Cumulative: 4026 min</em></li>
+<li><input data-index="61" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>62.</strong> - [Pathology] Basics of WBC (42 min) | <em>Cumulative: 4068 min</em></li>
+<li><input data-index="62" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>63.</strong> - [Pathology] Acute Lymphoblastic Leukemia (ALL) &amp; Acute Myeloid Leukemia (AML) (72 min) | <em>Cumulative: 4140 min</em></li>
+<li><input data-index="63" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>64.</strong> - [Pathology] Chronic Lymphocytic Leukemia (CLL) &amp; Chronic Myeloid Leukemia (CML) (44 min) | <em>Cumulative: 4184 min</em></li>
+<li><input data-index="64" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>65.</strong> - [Pathology] Hodgkin's &amp; Non-Hodgkin's Lymphoma (93 min) | <em>Cumulative: 4277 min</em></li>
+<li><input data-index="65" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>66.</strong> - [Pathology] Chronic Myeloproliferative Disorder and Myelodysplastic Syndromes (42 min) | <em>Cumulative: 4319 min</em></li>
+<li><input data-index="66" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>67.</strong> - [Pathology] Plasma Cell Dyscrasia (50 min) | <em>Cumulative: 4369 min</em></li>
+<li><input data-index="67" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>68.</strong> - [Pathology] Flow Cytometry (36 min) | <em>Cumulative: 4405 min</em></li>
+</ul>
+<h2>Day 7</h2><ul>
+<li><input data-index="68" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>69.</strong> - [Pathology] Platelet Part -I (Coagulation and Bleeding Disorders) (109 min) | <em>Cumulative: 4514 min</em></li>
+<li><input data-index="69" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>70.</strong> - [Pathology] Platelets Part -II (Mixing Studies) (34 min) | <em>Cumulative: 4548 min</em></li>
+<li><input data-index="70" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>71.</strong> - [Pathology] Blood Banking and Transfusion Medicine Part 1 (108 min) | <em>Cumulative: 4656 min</em></li>
+<li><input data-index="71" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>72.</strong> - [Pathology] Blood Banking and Transfusion Medicine Part 2 (24 min) | <em>Cumulative: 4680 min</em></li>
+<li><input data-index="72" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>73.</strong> - [Microbiology] Microscopes (46 min) | <em>Cumulative: 4726 min</em></li>
+<li><input data-index="73" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>74.</strong> - [Microbiology] Bacterial anatomy (69 min) | <em>Cumulative: 4795 min</em></li>
+<li><input data-index="74" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>75.</strong> - [Microbiology] Bacterial shapes and physiology (24 min) | <em>Cumulative: 4819 min</em></li>
+<li><input data-index="75" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>76.</strong> - [Microbiology] Bacterial genetics (57 min) | <em>Cumulative: 4876 min</em></li>
+<li><input data-index="76" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>77.</strong> - [Microbiology] Culture media (69 min) | <em>Cumulative: 4945 min</em></li>
+<li><input data-index="77" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>78.</strong> - [Microbiology] Sterilization and disinfection (82 min) | <em>Cumulative: 5027 min</em></li>
+<li><input data-index="78" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>79.</strong> - [Microbiology] Staphylococcace (59 min) | <em>Cumulative: 5086 min</em></li>
+<li><input data-index="79" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>80.</strong> - [Microbiology] Streptococcae (51 min) | <em>Cumulative: 5137 min</em></li>
+<li><input data-index="80" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>81.</strong> - [Microbiology] Neisseria (18 min) | <em>Cumulative: 5155 min</em></li>
+</ul>
+<h2>Day 8</h2><ul>
+<li><input data-index="81" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>82.</strong> - [Microbiology] Gram positive bacilli part 1 (59 min) | <em>Cumulative: 5214 min</em></li>
+<li><input data-index="82" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>83.</strong> - [Microbiology] Gram positive bacilli Part 2 (94 min) | <em>Cumulative: 5308 min</em></li>
+<li><input data-index="83" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>84.</strong> - [Microbiology] Gram positive bacilli Part 3 (77 min) | <em>Cumulative: 5385 min</em></li>
+<li><input data-index="84" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>85.</strong> - [Microbiology] Gram negative bacteria part 1 (54 min) | <em>Cumulative: 5439 min</em></li>
+<li><input data-index="85" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>86.</strong> - [Microbiology] Gram negative bacteria part 2 (79 min) | <em>Cumulative: 5518 min</em></li>
+<li><input data-index="86" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>87.</strong> - [Microbiology] Vibrio and non fermenters (54 min) | <em>Cumulative: 5572 min</em></li>
+<li><input data-index="87" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>88.</strong> - [Microbiology] HBB (Hemophilia, Bordertella and brucella) (39 min) | <em>Cumulative: 5611 min</em></li>
+<li><input data-index="88" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>89.</strong> - [Microbiology] Spirochetes (53 min) | <em>Cumulative: 5664 min</em></li>
+<li><input data-index="89" onchange="updateProgress(); saveProgress();" type="checkbox"/> <strong>90.</strong> - [Microbiology] Rickettsiae 
