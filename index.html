@@ -7,32 +7,24 @@
     <link rel="manifest" href="manifest.json" />
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
       html, body {
         height: 100%;
         font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
       }
-      .dark-mode {
-        background-color: #1a202c;
-        color: #f7fafc;
-      }
     </style>
   </head>
   <body class="bg-gradient-to-br from-blue-50 to-purple-100 min-h-screen flex">
-    <div id="quiz-app" class="flex w-full">
-      <!-- Sidebar -->
-      <aside id="sidebar" class="w-20 bg-white border-r p-2 space-y-2 overflow-y-auto"></aside>
+    <div id="quiz-app" class="flex flex-col w-full p-4">
+      <!-- Question Selector -->
+      <div id="question-selector" class="flex flex-wrap gap-2 mb-4 justify-center"></div>
 
       <!-- Main Quiz Area -->
-      <main class="flex-1 p-4 sm:p-10 max-w-6xl w-full mx-auto animate__animated animate__fadeIn">
+      <main class="max-w-4xl w-full mx-auto bg-white shadow-lg rounded-lg p-6">
         <div class="flex justify-between items-center mb-4">
-          <h1 class="text-xl sm:text-3xl font-bold text-blue-700">🧠 Smart Quiz</h1>
-          <div class="flex gap-3 items-center">
-            <button id="darkToggle" class="text-xs px-3 py-1 border rounded">🌗 Toggle Mode</button>
-            <div id="score-counter" class="text-sm font-medium text-gray-700">Score: 0</div>
-          </div>
+          <h1 class="text-xl sm:text-2xl font-bold text-blue-700">🧠 Smart Quiz</h1>
+          <div id="score-counter" class="text-sm font-medium text-gray-700">Score: 0</div>
         </div>
 
         <div class="flex justify-between items-center mb-2">
@@ -43,27 +35,16 @@
         <div id="question-box" class="mb-4">
           <div id="question-text" class="text-lg font-semibold mb-2"></div>
           <div id="question-media" class="mb-2"></div>
-          <button id="hint-btn" class="mb-2 text-xs text-blue-600 underline hidden">💡 Show Hint</button>
-          <div id="hint-text" class="text-sm text-yellow-600 hidden"></div>
         </div>
 
         <form id="options-form" class="space-y-3"></form>
 
-        <div class="flex flex-wrap items-center justify-between gap-2 mt-6">
-          <div class="flex gap-2">
-            <button id="prev-btn" class="px-3 py-2 bg-gray-300 rounded">⬅ Prev</button>
-            <button id="next-btn" class="px-3 py-2 bg-blue-600 text-white rounded">Next ➡</button>
-          </div>
-          <div class="flex gap-2">
-            <button id="bookmark-btn" class="px-3 py-2 border rounded">⭐ Bookmark</button>
-            <button id="review-btn" class="px-3 py-2 border rounded">🟨 Mark for Review</button>
-            <button id="submit-btn" class="px-3 py-2 bg-green-600 text-white rounded">Submit</button>
-          </div>
-        </div>
-
         <div id="explanation" class="hidden mt-4 p-4 bg-yellow-100 text-yellow-800 rounded-md text-sm"></div>
 
-        <div id="result-box" class="hidden mt-6"></div>
+        <div class="flex justify-between mt-6">
+          <button id="prev-btn" class="px-4 py-2 bg-gray-300 rounded">⬅ Prev</button>
+          <button id="next-btn" class="px-4 py-2 bg-blue-600 text-white rounded">Next ➡</button>
+        </div>
       </main>
     </div>
 
@@ -79,22 +60,22 @@
         .then(data => {
           questions = data;
           document.getElementById('qTotal').textContent = questions.length;
-          renderSidebar();
+          renderQuestionSelector();
           renderQuestion();
         });
 
-      function renderSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.innerHTML = '';
+      function renderQuestionSelector() {
+        const container = document.getElementById('question-selector');
+        container.innerHTML = '';
         questions.forEach((_, idx) => {
           const btn = document.createElement('button');
-          btn.className = 'w-full py-2 text-sm bg-blue-100 rounded hover:bg-blue-300';
           btn.textContent = idx + 1;
+          btn.className = 'px-3 py-1 rounded bg-blue-100 hover:bg-blue-300 text-sm';
           btn.onclick = () => {
             current = idx;
             renderQuestion();
           };
-          sidebar.appendChild(btn);
+          container.appendChild(btn);
         });
       }
 
@@ -106,8 +87,8 @@
         document.getElementById('question-text').textContent = q.question;
         document.getElementById('qTotal').textContent = questions.length;
         document.getElementById('options-form').innerHTML = '';
+        document.getElementById('explanation').classList.add('hidden');
 
-        // Timer
         let timeLeft = 30;
         document.getElementById('timer').textContent = `${timeLeft}s`;
         timerInterval = setInterval(() => {
@@ -119,7 +100,6 @@
           }
         }, 1000);
 
-        // Options
         Object.entries(q.options).forEach(([key, value]) => {
           const label = document.createElement('label');
           label.className = 'block p-2 border rounded hover:bg-blue-50 cursor-pointer';
@@ -128,19 +108,34 @@
           input.name = 'option';
           input.value = key;
           input.className = 'mr-2';
+          input.onclick = () => handleAnswer(input.value);
           label.appendChild(input);
           label.appendChild(document.createTextNode(`${key}. ${value}`));
           document.getElementById('options-form').appendChild(label);
         });
       }
 
-      document.getElementById('next-btn').onclick = () => nextQuestion();
-      document.getElementById('prev-btn').onclick = () => {
-        if (current > 0) {
-          current--;
-          renderQuestion();
-        }
-      };
+      function handleAnswer(selectedKey) {
+        const correctKey = questions[current].answerKey;
+        const explanation = questions[current].explanation;
+        const allLabels = document.querySelectorAll('#options-form label');
+
+        allLabels.forEach(label => {
+          const input = label.querySelector('input');
+          input.disabled = true;
+          if (input.value === correctKey) {
+            label.classList.add('bg-green-100');
+          } else if (input.value === selectedKey) {
+            label.classList.add('bg-red-100');
+          }
+        });
+
+        if (selectedKey === correctKey) score++;
+        document.getElementById('score-counter').textContent = `Score: ${score}`;
+        document.getElementById('explanation').textContent = `📘 ${explanation}`;
+        document.getElementById('explanation').classList.remove('hidden');
+        clearInterval(timerInterval);
+      }
 
       function nextQuestion() {
         if (current < questions.length - 1) {
@@ -151,13 +146,17 @@
         }
       }
 
+      document.getElementById('next-btn').onclick = nextQuestion;
+      document.getElementById('prev-btn').onclick = () => {
+        if (current > 0) {
+          current--;
+          renderQuestion();
+        }
+      };
+
       function showResult() {
         document.getElementById('quiz-app').innerHTML = `<div class='m-auto text-center p-6'><h2 class='text-2xl font-bold'>🎉 Quiz Completed!</h2><p class='mt-2'>You scored <strong>${score}</strong> out of ${questions.length}</p></div>`;
       }
-
-      document.getElementById('darkToggle').onclick = () => {
-        document.body.classList.toggle('dark-mode');
-      };
     </script>
   </body>
 </html>
