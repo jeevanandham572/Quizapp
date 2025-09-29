@@ -13,14 +13,20 @@
         height: 100%;
         font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
       }
+      .animate-pop {
+        animation: pop .4s ease-out forwards;
+      }
+      @keyframes pop {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+      }
     </style>
   </head>
   <body class="bg-gradient-to-br from-blue-50 to-purple-100 min-h-screen flex">
     <div id="quiz-app" class="flex flex-col w-full p-4">
-      <!-- Question Selector -->
       <div id="question-selector" class="flex flex-wrap gap-2 mb-4 justify-center"></div>
 
-      <!-- Main Quiz Area -->
       <main class="max-w-4xl w-full mx-auto bg-white shadow-lg rounded-lg p-6">
         <div class="flex justify-between items-center mb-4">
           <h1 class="text-xl sm:text-2xl font-bold text-blue-700">🧠 Smart Quiz</h1>
@@ -53,7 +59,7 @@
       let current = 0;
       let score = 0;
       let timerInterval;
-      const selectedAnswers = {};
+      let selectedAnswers = JSON.parse(localStorage.getItem('selectedAnswers') || '{}');
 
       fetch('quiz.json')
         .then(res => res.json())
@@ -88,6 +94,7 @@
         document.getElementById('qTotal').textContent = questions.length;
         document.getElementById('options-form').innerHTML = '';
         document.getElementById('explanation').classList.add('hidden');
+        document.getElementById('explanation').textContent = '';
 
         let timeLeft = 30;
         document.getElementById('timer').textContent = `${timeLeft}s`;
@@ -108,7 +115,13 @@
           input.name = 'option';
           input.value = key;
           input.className = 'mr-2';
-          input.onclick = () => handleAnswer(input.value);
+
+          if (selectedAnswers[current] && selectedAnswers[current] === key) {
+            input.checked = true;
+            showAnswerFeedback(key);
+          }
+
+          input.onclick = () => handleAnswer(key);
           label.appendChild(input);
           label.appendChild(document.createTextNode(`${key}. ${value}`));
           document.getElementById('options-form').appendChild(label);
@@ -116,6 +129,12 @@
       }
 
       function handleAnswer(selectedKey) {
+        selectedAnswers[current] = selectedKey;
+        localStorage.setItem('selectedAnswers', JSON.stringify(selectedAnswers));
+        showAnswerFeedback(selectedKey);
+      }
+
+      function showAnswerFeedback(selectedKey) {
         const correctKey = questions[current].answerKey;
         const explanation = questions[current].explanation;
         const allLabels = document.querySelectorAll('#options-form label');
@@ -124,9 +143,9 @@
           const input = label.querySelector('input');
           input.disabled = true;
           if (input.value === correctKey) {
-            label.classList.add('bg-green-100');
+            label.classList.add('bg-green-100', 'animate-pop');
           } else if (input.value === selectedKey) {
-            label.classList.add('bg-red-100');
+            label.classList.add('bg-red-100', 'animate-pop');
           }
         });
 
