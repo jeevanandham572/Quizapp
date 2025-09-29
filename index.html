@@ -1,213 +1,295 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Smart Quiz – All-in-One</title>
-    <link rel="manifest" href="manifest.json" />
+
+    <!-- UI libs (CDN) -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <style>
-      html, body {
-        height: 100%;
-        font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
-      }
-      .animate-pop {
-        animation: pop .4s ease-out forwards;
-      }
-      @keyframes pop {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
-      }
+      html, body { height: 100%; font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif; }
+      .animate-pop { animation: pop .4s ease-out forwards; }
+      @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.05)} 100%{transform:scale(1)} }
     </style>
   </head>
-  <body class="bg-gradient-to-br from-blue-50 to-purple-100 min-h-screen flex">
-    <div id="quiz-app" class="flex flex-col w-full p-4">
-      <div class="flex justify-center mb-4">
-        <label for="question-dropdown" class="mr-2 font-medium text-gray-700">Jump to Question:</label>
-        <select id="question-dropdown" class="px-4 py-2 rounded border border-gray-300">
-          <option disabled selected>Loading...</option>
-        </select>
-      </div><main class="max-w-4xl w-full mx-auto bg-white shadow-lg rounded-lg p-6">
-    <div class="flex justify-between items-center mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold text-blue-700">🧠 Smart Quiz</h1>
-      <div id="score-counter" class="text-sm font-medium text-gray-700">Score: 0</div>
-    </div>
+  <body class="bg-gradient-to-br from-blue-50 to-purple-100 min-h-screen flex flex-col">
+    <!-- Top controls -->
+    <header class="w-full p-4">
+      <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        <h1 class="text-2xl font-bold text-blue-700">🧠 Smart Quiz</h1>
+        <div class="flex items-center gap-2">
+          <label for="question-dropdown" class="text-sm font-medium text-gray-700">Jump to:</label>
+          <select id="question-dropdown" class="px-3 py-2 rounded border border-gray-300 text-sm">
+            <option disabled selected>Loading...</option>
+          </select>
+        </div>
+      </div>
+    </header>
 
-    <div class="flex justify-between items-center mb-2">
-      <div class="text-sm font-semibold">Question <span id="qNum">1</span> / <span id="qTotal">0</span></div>
-      <div class="text-sm font-semibold text-red-600" id="timer">30s</div>
-    </div>
+    <!-- Main app -->
+    <main class="w-full flex-1 p-4">
+      <div id="quiz-card" class="max-w-4xl w-full mx-auto bg-white shadow-lg rounded-lg p-6">
+        <!-- Meta row -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="text-sm font-semibold">Question <span id="qNum">1</span> / <span id="qTotal">0</span></div>
+          <div class="text-sm font-semibold text-red-600" id="timer">30s</div>
+          <div id="score-counter" class="text-sm font-medium text-gray-700">Score: 0</div>
+        </div>
 
-    <div id="question-box" class="mb-4">
-      <div id="question-text" class="text-lg font-semibold mb-2"></div>
-      <div id="question-media" class="mb-2"></div>
-    </div>
+        <!-- Question -->
+        <div id="question-box" class="mb-4">
+          <div id="question-text" class="text-lg font-semibold mb-2"></div>
+          <div id="question-media" class="mb-2"></div>
+        </div>
 
-    <form id="options-form" class="space-y-3"></form>
+        <!-- Options -->
+        <form id="options-form" class="space-y-3"></form>
 
-    <div id="explanation" class="hidden mt-4 p-4 bg-yellow-100 text-yellow-800 rounded-md text-sm"></div>
+        <!-- Explanation -->
+        <div id="explanation" class="hidden mt-4 p-4 bg-yellow-100 text-yellow-800 rounded-md text-sm"></div>
 
-    <!-- Ad block below each question -->
-    <div class="my-6">
-      <script async="async" data-cfasync="false" src="//pl27748133.revenuecpmgate.com/f3a93d528569724dcead65358cfeccb8/invoke.js"></script>
-      <div id="container-f3a93d528569724dcead65358cfeccb8"></div>
-    </div>
+        <!-- Nav -->
+        <div class="flex justify-between mt-6">
+          <button id="prev-btn" class="px-4 py-2 bg-gray-300 rounded">⬅ Prev</button>
+          <button id="next-btn" class="px-4 py-2 bg-blue-600 text-white rounded">Next ➡</button>
+        </div>
 
-    <div class="flex justify-between mt-6">
-      <button id="prev-btn" class="px-4 py-2 bg-gray-300 rounded">⬅ Prev</button>
-      <button id="next-btn" class="px-4 py-2 bg-blue-600 text-white rounded">Next ➡</button>
-    </div>
+        <!-- Submit -->
+        <div class="text-center mt-6">
+          <button id="submit-btn" class="px-6 py-3 bg-green-600 text-white rounded shadow-md hover:bg-green-700">✅ Submit Test</button>
+        </div>
+      </div>
+    </main>
 
-    <div class="text-center mt-6">
-      <button id="submit-btn" class="px-6 py-3 bg-green-600 text-white rounded shadow-md hover:bg-green-700">✅ Submit Test</button>
-    </div>
-  </main>
-</div>
-
-<script>
-  let questions = [];
-  let current = 0;
-  let score = 0;
-  let timerInterval;
-  let selectedAnswers = JSON.parse(localStorage.getItem('selectedAnswers') || '{}');
-
-  fetch('quiz.json')
-    .then(res => res.json())
-    .then(data => {
-      questions = data;
-      document.getElementById('qTotal').textContent = questions.length;
-      populateDropdown();
-      renderQuestion();
-    });
-
-  function populateDropdown() {
-    const dropdown = document.getElementById('question-dropdown');
-    dropdown.innerHTML = '';
-    questions.forEach((_, idx) => {
-      const option = document.createElement('option');
-      option.value = idx;
-      option.textContent = `Question ${idx + 1}`;
-      dropdown.appendChild(option);
-    });
-    dropdown.selectedIndex = current;
-    dropdown.onchange = (e) => {
-      current = parseInt(e.target.value);
-      renderQuestion();
-    };
-  }
-
-  function renderQuestion() {
-    clearInterval(timerInterval);
-    const q = questions[current];
-
-    document.getElementById('qNum').textContent = current + 1;
-    document.getElementById('question-text').textContent = q.question;
-    document.getElementById('qTotal').textContent = questions.length;
-    document.getElementById('options-form').innerHTML = '';
-    document.getElementById('explanation').classList.add('hidden');
-    document.getElementById('explanation').textContent = '';
-
-    let timeLeft = 30;
-    document.getElementById('timer').textContent = `${timeLeft}s`;
-    timerInterval = setInterval(() => {
-      timeLeft--;
-      document.getElementById('timer').textContent = `${timeLeft}s`;
-      if (timeLeft === 0) {
-        clearInterval(timerInterval);
-        nextQuestion();
-      }
-    }, 1000);
-
-    const savedAnswer = selectedAnswers[current];
-
-    Object.entries(q.options).forEach(([key, value]) => {
-      const label = document.createElement('label');
-      label.className = 'block p-2 border rounded hover:bg-blue-50 cursor-pointer';
-      const input = document.createElement('input');
-      input.type = q.multi ? 'checkbox' : 'radio';
-      input.name = 'option';
-      input.value = key;
-      input.className = 'mr-2';
-
-      if (savedAnswer && savedAnswer === key) {
-        input.checked = true;
-        showAnswerFeedback(key);
-      }
-
-      input.onclick = () => handleAnswer(key);
-      label.appendChild(input);
-      label.appendChild(document.createTextNode(`${key}. ${value}`));
-      document.getElementById('options-form').appendChild(label);
-    });
-
-    document.getElementById('question-dropdown').selectedIndex = current;
-  }
-
-  function handleAnswer(selectedKey) {
-    selectedAnswers[current] = selectedKey;
-    localStorage.setItem('selectedAnswers', JSON.stringify(selectedAnswers));
-    showAnswerFeedback(selectedKey);
-  }
-
-  function showAnswerFeedback(selectedKey) {
-    const correctKey = questions[current].answerKey;
-    const explanation = questions[current].explanation;
-    const allLabels = document.querySelectorAll('#options-form label');
-
-    allLabels.forEach(label => {
-      const input = label.querySelector('input');
-      input.disabled = true;
-      if (input.value === correctKey) {
-        label.classList.add('bg-green-100', 'animate-pop');
-      } else if (input.value === selectedKey) {
-        label.classList.add('bg-red-100', 'animate-pop');
-      }
-    });
-
-    if (selectedKey === correctKey) score++;
-    document.getElementById('score-counter').textContent = `Score: ${score}`;
-    document.getElementById('explanation').textContent = `📘 ${explanation}`;
-    document.getElementById('explanation').classList.remove('hidden');
-    clearInterval(timerInterval);
-  }
-
-  function nextQuestion() {
-    if (current < questions.length - 1) {
-      current++;
-      renderQuestion();
-    } else {
-      showResult();
-    }
-  }
-
-  document.getElementById('next-btn').onclick = nextQuestion;
-  document.getElementById('prev-btn').onclick = () => {
-    if (current > 0) {
-      current--;
-      renderQuestion();
-    }
-  };
-
-  document.getElementById('submit-btn').onclick = () => {
-    showResult();
-  };
-
-  function showResult() {
-    document.getElementById('quiz-app').innerHTML = `
-      <div class='m-auto text-center p-6'>
-        <h2 class='text-2xl font-bold'>🎉 Test Submitted</h2>
-        <p class='mt-2 text-lg'>You scored <strong>${score}</strong> out of ${questions.length}</p>
-
-        <div class='my-6'>
+    <!-- SAFE AD PLACEMENT (single instance, outside dynamic quiz rendering) -->
+    <footer class="w-full">
+      <div class="max-w-4xl mx-auto p-4">
+        <div class="my-4 text-center">
+          <!-- Your ad unit: placed once, with a single unique container id -->
           <script async="async" data-cfasync="false" src="//pl27748133.revenuecpmgate.com/f3a93d528569724dcead65358cfeccb8/invoke.js"></script>
           <div id="container-f3a93d528569724dcead65358cfeccb8"></div>
         </div>
       </div>
-    `;
-  }
-</script>
+    </footer>
 
+    <script>
+      // --- State ---
+      let questions = [];
+      let current = 0;
+      let timerInterval;
+      let timePerQuestion = 30;
+
+      // Persisted: selected answers (single-answer only in this template)
+      const selectedAnswers = JSON.parse(localStorage.getItem('selectedAnswers') || '{}');
+
+      // Correctness map to prevent double-counting when revisiting
+      const correctness = JSON.parse(localStorage.getItem('correctness') || '{}');
+
+      // --- Init ---
+      fetch('quiz.json')
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to load quiz.json');
+          return res.json();
+        })
+        .then(data => {
+          if (!Array.isArray(data)) throw new Error('quiz.json must be an array');
+          questions = data;
+          document.getElementById('qTotal').textContent = questions.length;
+          populateDropdown();
+          renderQuestion();
+          updateScore(); // from any prior saved answers
+        })
+        .catch(err => {
+          document.getElementById('quiz-card').innerHTML =
+            `<div class="text-center p-6">
+               <h2 class="text-xl font-bold text-red-600">Error loading quiz</h2>
+               <p class="mt-2 text-sm text-gray-700">${err.message}</p>
+               <p class="mt-1 text-xs text-gray-500">Ensure quiz.json exists in the same folder and is valid JSON.</p>
+             </div>`;
+        });
+
+      // --- Helpers ---
+      function populateDropdown() {
+        const dd = document.getElementById('question-dropdown');
+        dd.innerHTML = '';
+        questions.forEach((_, idx) => {
+          const opt = document.createElement('option');
+          opt.value = idx;
+          opt.textContent = `Question ${idx + 1}`;
+          dd.appendChild(opt);
+        });
+        dd.value = current;
+        dd.onchange = e => {
+          current = parseInt(e.target.value, 10) || 0;
+          renderQuestion();
+        };
+      }
+
+      function renderQuestion() {
+        clearInterval(timerInterval);
+        if (!questions.length) return;
+
+        const q = questions[current];
+        document.getElementById('qNum').textContent = current + 1;
+        document.getElementById('qTotal').textContent = questions.length;
+
+        // Content
+        document.getElementById('question-text').textContent = q.question || '';
+
+        // Optional media (image/video) if present in JSON
+        const media = document.getElementById('question-media');
+        media.innerHTML = '';
+        if (q.image) {
+          const img = document.createElement('img');
+          img.src = q.image;
+          img.alt = 'question image';
+          img.className = 'max-h-64 rounded';
+          media.appendChild(img);
+        }
+        if (q.video) {
+          const vid = document.createElement('video');
+          vid.src = q.video;
+          vid.controls = true;
+          vid.className = 'w-full rounded';
+          media.appendChild(vid);
+        }
+
+        // Options
+        const form = document.getElementById('options-form');
+        form.innerHTML = '';
+        const saved = selectedAnswers[current];
+
+        Object.entries(q.options || {}).forEach(([key, value]) => {
+          const label = document.createElement('label');
+          label.className = 'block p-2 border rounded hover:bg-blue-50 cursor-pointer transition';
+
+          const input = document.createElement('input');
+          input.type = q.multi ? 'checkbox' : 'radio';
+          input.name = 'option';
+          input.value = key;
+          input.className = 'mr-2';
+
+          if (!q.multi && saved && saved === key) {
+            input.checked = true;
+          }
+
+          input.onclick = () => handleAnswerClick(q, key);
+          label.appendChild(input);
+          label.appendChild(document.createTextNode(`${key}. ${value}`));
+          form.appendChild(label);
+        });
+
+        // Reset explanation
+        const expl = document.getElementById('explanation');
+        expl.classList.add('hidden');
+        expl.textContent = '';
+
+        // If we already answered this question (from localStorage), show feedback
+        if (!q.multi && saved) {
+          showAnswerFeedback(q, saved, /*fromRestore*/ true);
+        }
+
+        // Timer
+        startTimer();
+        // Sync dropdown
+        document.getElementById('question-dropdown').value = current;
+      }
+
+      function startTimer() {
+        let timeLeft = timePerQuestion;
+        const el = document.getElementById('timer');
+        el.textContent = `${timeLeft}s`;
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          el.textContent = `${timeLeft}s`;
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            nextQuestion();
+          }
+        }, 1000);
+      }
+
+      function handleAnswerClick(q, selectedKey) {
+        if (q.multi) {
+          // (Optional) Extend for multi-select later
+          return;
+        }
+        // Save answer
+        selectedAnswers[current] = selectedKey;
+        localStorage.setItem('selectedAnswers', JSON.stringify(selectedAnswers));
+        // Show feedback
+        showAnswerFeedback(q, selectedKey, false);
+        // Update correctness map & score
+        correctness[current] = (selectedKey === q.answerKey);
+        localStorage.setItem('correctness', JSON.stringify(correctness));
+        updateScore();
+      }
+
+      function showAnswerFeedback(q, selectedKey, fromRestore) {
+        const correctKey = q.answerKey;
+        const allLabels = document.querySelectorAll('#options-form label');
+
+        allLabels.forEach(label => {
+          const input = label.querySelector('input');
+          input.disabled = true;
+
+          if (input.value === correctKey) {
+            label.classList.add('bg-green-100');
+            if (!fromRestore) label.classList.add('animate-pop');
+          } else if (input.value === selectedKey) {
+            label.classList.add('bg-red-100');
+            if (!fromRestore) label.classList.add('animate-pop');
+          }
+        });
+
+        const expl = document.getElementById('explanation');
+        if (q.explanation) {
+          expl.textContent = `📘 ${q.explanation}`;
+          expl.classList.remove('hidden');
+        }
+        clearInterval(timerInterval);
+      }
+
+      function updateScore() {
+        // Compute from correctness map to avoid double counts
+        const total = Object.values(correctness).filter(Boolean).length;
+        document.getElementById('score-counter').textContent = `Score: ${total}`;
+      }
+
+      function nextQuestion() {
+        if (current < questions.length - 1) {
+          current++;
+          renderQuestion();
+        } else {
+          showResult();
+        }
+      }
+
+      document.getElementById('next-btn').onclick = nextQuestion;
+      document.getElementById('prev-btn').onclick = () => {
+        if (current > 0) {
+          current--;
+          renderQuestion();
+        }
+      };
+      document.getElementById('submit-btn').onclick = () => showResult();
+
+      function showResult() {
+        clearInterval(timerInterval);
+        const finalScore = Object.values(correctness).filter(Boolean).length;
+        // Replace main content with score summary only (as requested)
+        const app = document.querySelector('main');
+        app.innerHTML = `
+          <div class="max-w-3xl mx-auto bg-white p-8 rounded shadow text-center">
+            <h2 class="text-2xl font-bold">🎉 Test Submitted</h2>
+            <p class="mt-3 text-lg">You scored <strong>${finalScore}</strong> out of ${questions.length}</p>
+          </div>
+        `;
+      }
+    </script>
   </body>
 </html>
