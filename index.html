@@ -192,28 +192,12 @@
       };
 
       function showResult() {
-        let html = `<div class='max-w-3xl mx-auto bg-white p-6 rounded shadow'>
-          <h2 class='text-2xl font-bold text-center mb-4'>🎉 Test Submitted</h2>
-          <p class='text-lg text-center mb-6'>You scored <strong>${score}</strong> out of ${questions.length}</p>
-          <h3 class='text-xl font-semibold mb-4'>📊 Detailed Report</h3>
-          <ol class='space-y-4'>`;
-
-        questions.forEach((q, i) => {
-          const yourAnswer = selectedAnswers[i];
-          const isCorrect = yourAnswer === q.answerKey;
-          const statusClass = isCorrect ? 'text-green-700' : 'text-red-700';
-          html += `<li>
-            <div class='font-medium'>Q${i + 1}. ${q.question}</div>
-            <div class='ml-4'>
-              <div>Your Answer: <span class='${statusClass} font-semibold'>${yourAnswer || 'Not answered'}</span></div>
-              <div>Correct Answer: <strong>${q.answerKey}</strong></div>
-              <div class='text-sm text-gray-600'>Explanation: ${q.explanation}</div>
-            </div>
-          </li>`;
-        });
-
-        html += '</ol></div>';
-        document.getElementById('quiz-app').innerHTML = html;
+        document.getElementById('quiz-app').innerHTML = `
+          <div class='m-auto text-center p-6'>
+            <h2 class='text-2xl font-bold'>🎉 Test Submitted</h2>
+            <p class='mt-2 text-lg'>You scored <strong>${score}</strong> out of ${questions.length}</p>
+          </div>
+        `;
       }
     </script>
   </body>
