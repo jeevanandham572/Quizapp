@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -30,175 +29,185 @@
         <select id="question-dropdown" class="px-4 py-2 rounded border border-gray-300">
           <option disabled selected>Loading...</option>
         </select>
-      </div>
-
-      <main class="max-w-4xl w-full mx-auto bg-white shadow-lg rounded-lg p-6">
-        <div class="flex justify-between items-center mb-4">
-          <h1 class="text-xl sm:text-2xl font-bold text-blue-700">🧠 Smart Quiz</h1>
-          <div id="score-counter" class="text-sm font-medium text-gray-700">Score: 0</div>
-        </div>
-
-        <div class="flex justify-between items-center mb-2">
-          <div class="text-sm font-semibold">Question <span id="qNum">1</span> / <span id="qTotal">0</span></div>
-          <div class="text-sm font-semibold text-red-600" id="timer">30s</div>
-        </div>
-
-        <div id="question-box" class="mb-4">
-          <div id="question-text" class="text-lg font-semibold mb-2"></div>
-          <div id="question-media" class="mb-2"></div>
-        </div>
-
-        <form id="options-form" class="space-y-3"></form>
-
-        <div id="explanation" class="hidden mt-4 p-4 bg-yellow-100 text-yellow-800 rounded-md text-sm"></div>
-
-        <div class="flex justify-between mt-6">
-          <button id="prev-btn" class="px-4 py-2 bg-gray-300 rounded">⬅ Prev</button>
-          <button id="next-btn" class="px-4 py-2 bg-blue-600 text-white rounded">Next ➡</button>
-        </div>
-
-        <div class="text-center mt-6">
-          <button id="submit-btn" class="px-6 py-3 bg-green-600 text-white rounded shadow-md hover:bg-green-700">✅ Submit Test</button>
-        </div>
-      </main>
+      </div><main class="max-w-4xl w-full mx-auto bg-white shadow-lg rounded-lg p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-xl sm:text-2xl font-bold text-blue-700">🧠 Smart Quiz</h1>
+      <div id="score-counter" class="text-sm font-medium text-gray-700">Score: 0</div>
     </div>
 
-    <script>
-      let questions = [];
-      let current = 0;
-      let score = 0;
-      let timerInterval;
-      let selectedAnswers = JSON.parse(localStorage.getItem('selectedAnswers') || '{}');
+    <div class="flex justify-between items-center mb-2">
+      <div class="text-sm font-semibold">Question <span id="qNum">1</span> / <span id="qTotal">0</span></div>
+      <div class="text-sm font-semibold text-red-600" id="timer">30s</div>
+    </div>
 
-      fetch('quiz.json')
-        .then(res => res.json())
-        .then(data => {
-          questions = data;
-          document.getElementById('qTotal').textContent = questions.length;
-          populateDropdown();
-          renderQuestion();
-        });
+    <div id="question-box" class="mb-4">
+      <div id="question-text" class="text-lg font-semibold mb-2"></div>
+      <div id="question-media" class="mb-2"></div>
+    </div>
 
-      function populateDropdown() {
-        const dropdown = document.getElementById('question-dropdown');
-        dropdown.innerHTML = '';
-        questions.forEach((_, idx) => {
-          const option = document.createElement('option');
-          option.value = idx;
-          option.textContent = `Question ${idx + 1}`;
-          dropdown.appendChild(option);
-        });
-        dropdown.selectedIndex = current;
-        dropdown.onchange = (e) => {
-          current = parseInt(e.target.value);
-          renderQuestion();
-        };
-      }
+    <form id="options-form" class="space-y-3"></form>
 
-      function renderQuestion() {
+    <div id="explanation" class="hidden mt-4 p-4 bg-yellow-100 text-yellow-800 rounded-md text-sm"></div>
+
+    <!-- Ad block below each question -->
+    <div class="my-6">
+      <script async="async" data-cfasync="false" src="//pl27748133.revenuecpmgate.com/f3a93d528569724dcead65358cfeccb8/invoke.js"></script>
+      <div id="container-f3a93d528569724dcead65358cfeccb8"></div>
+    </div>
+
+    <div class="flex justify-between mt-6">
+      <button id="prev-btn" class="px-4 py-2 bg-gray-300 rounded">⬅ Prev</button>
+      <button id="next-btn" class="px-4 py-2 bg-blue-600 text-white rounded">Next ➡</button>
+    </div>
+
+    <div class="text-center mt-6">
+      <button id="submit-btn" class="px-6 py-3 bg-green-600 text-white rounded shadow-md hover:bg-green-700">✅ Submit Test</button>
+    </div>
+  </main>
+</div>
+
+<script>
+  let questions = [];
+  let current = 0;
+  let score = 0;
+  let timerInterval;
+  let selectedAnswers = JSON.parse(localStorage.getItem('selectedAnswers') || '{}');
+
+  fetch('quiz.json')
+    .then(res => res.json())
+    .then(data => {
+      questions = data;
+      document.getElementById('qTotal').textContent = questions.length;
+      populateDropdown();
+      renderQuestion();
+    });
+
+  function populateDropdown() {
+    const dropdown = document.getElementById('question-dropdown');
+    dropdown.innerHTML = '';
+    questions.forEach((_, idx) => {
+      const option = document.createElement('option');
+      option.value = idx;
+      option.textContent = `Question ${idx + 1}`;
+      dropdown.appendChild(option);
+    });
+    dropdown.selectedIndex = current;
+    dropdown.onchange = (e) => {
+      current = parseInt(e.target.value);
+      renderQuestion();
+    };
+  }
+
+  function renderQuestion() {
+    clearInterval(timerInterval);
+    const q = questions[current];
+
+    document.getElementById('qNum').textContent = current + 1;
+    document.getElementById('question-text').textContent = q.question;
+    document.getElementById('qTotal').textContent = questions.length;
+    document.getElementById('options-form').innerHTML = '';
+    document.getElementById('explanation').classList.add('hidden');
+    document.getElementById('explanation').textContent = '';
+
+    let timeLeft = 30;
+    document.getElementById('timer').textContent = `${timeLeft}s`;
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      document.getElementById('timer').textContent = `${timeLeft}s`;
+      if (timeLeft === 0) {
         clearInterval(timerInterval);
-        const q = questions[current];
+        nextQuestion();
+      }
+    }, 1000);
 
-        document.getElementById('qNum').textContent = current + 1;
-        document.getElementById('question-text').textContent = q.question;
-        document.getElementById('qTotal').textContent = questions.length;
-        document.getElementById('options-form').innerHTML = '';
-        document.getElementById('explanation').classList.add('hidden');
-        document.getElementById('explanation').textContent = '';
+    const savedAnswer = selectedAnswers[current];
 
-        let timeLeft = 30;
-        document.getElementById('timer').textContent = `${timeLeft}s`;
-        timerInterval = setInterval(() => {
-          timeLeft--;
-          document.getElementById('timer').textContent = `${timeLeft}s`;
-          if (timeLeft === 0) {
-            clearInterval(timerInterval);
-            nextQuestion();
-          }
-        }, 1000);
+    Object.entries(q.options).forEach(([key, value]) => {
+      const label = document.createElement('label');
+      label.className = 'block p-2 border rounded hover:bg-blue-50 cursor-pointer';
+      const input = document.createElement('input');
+      input.type = q.multi ? 'checkbox' : 'radio';
+      input.name = 'option';
+      input.value = key;
+      input.className = 'mr-2';
 
-        const savedAnswer = selectedAnswers[current];
-
-        Object.entries(q.options).forEach(([key, value]) => {
-          const label = document.createElement('label');
-          label.className = 'block p-2 border rounded hover:bg-blue-50 cursor-pointer';
-          const input = document.createElement('input');
-          input.type = q.multi ? 'checkbox' : 'radio';
-          input.name = 'option';
-          input.value = key;
-          input.className = 'mr-2';
-
-          if (savedAnswer && savedAnswer === key) {
-            input.checked = true;
-            showAnswerFeedback(key);
-          }
-
-          input.onclick = () => handleAnswer(key);
-          label.appendChild(input);
-          label.appendChild(document.createTextNode(`${key}. ${value}`));
-          document.getElementById('options-form').appendChild(label);
-        });
-
-        document.getElementById('question-dropdown').selectedIndex = current;
+      if (savedAnswer && savedAnswer === key) {
+        input.checked = true;
+        showAnswerFeedback(key);
       }
 
-      function handleAnswer(selectedKey) {
-        selectedAnswers[current] = selectedKey;
-        localStorage.setItem('selectedAnswers', JSON.stringify(selectedAnswers));
-        showAnswerFeedback(selectedKey);
+      input.onclick = () => handleAnswer(key);
+      label.appendChild(input);
+      label.appendChild(document.createTextNode(`${key}. ${value}`));
+      document.getElementById('options-form').appendChild(label);
+    });
+
+    document.getElementById('question-dropdown').selectedIndex = current;
+  }
+
+  function handleAnswer(selectedKey) {
+    selectedAnswers[current] = selectedKey;
+    localStorage.setItem('selectedAnswers', JSON.stringify(selectedAnswers));
+    showAnswerFeedback(selectedKey);
+  }
+
+  function showAnswerFeedback(selectedKey) {
+    const correctKey = questions[current].answerKey;
+    const explanation = questions[current].explanation;
+    const allLabels = document.querySelectorAll('#options-form label');
+
+    allLabels.forEach(label => {
+      const input = label.querySelector('input');
+      input.disabled = true;
+      if (input.value === correctKey) {
+        label.classList.add('bg-green-100', 'animate-pop');
+      } else if (input.value === selectedKey) {
+        label.classList.add('bg-red-100', 'animate-pop');
       }
+    });
 
-      function showAnswerFeedback(selectedKey) {
-        const correctKey = questions[current].answerKey;
-        const explanation = questions[current].explanation;
-        const allLabels = document.querySelectorAll('#options-form label');
+    if (selectedKey === correctKey) score++;
+    document.getElementById('score-counter').textContent = `Score: ${score}`;
+    document.getElementById('explanation').textContent = `📘 ${explanation}`;
+    document.getElementById('explanation').classList.remove('hidden');
+    clearInterval(timerInterval);
+  }
 
-        allLabels.forEach(label => {
-          const input = label.querySelector('input');
-          input.disabled = true;
-          if (input.value === correctKey) {
-            label.classList.add('bg-green-100', 'animate-pop');
-          } else if (input.value === selectedKey) {
-            label.classList.add('bg-red-100', 'animate-pop');
-          }
-        });
+  function nextQuestion() {
+    if (current < questions.length - 1) {
+      current++;
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }
 
-        if (selectedKey === correctKey) score++;
-        document.getElementById('score-counter').textContent = `Score: ${score}`;
-        document.getElementById('explanation').textContent = `📘 ${explanation}`;
-        document.getElementById('explanation').classList.remove('hidden');
-        clearInterval(timerInterval);
-      }
+  document.getElementById('next-btn').onclick = nextQuestion;
+  document.getElementById('prev-btn').onclick = () => {
+    if (current > 0) {
+      current--;
+      renderQuestion();
+    }
+  };
 
-      function nextQuestion() {
-        if (current < questions.length - 1) {
-          current++;
-          renderQuestion();
-        } else {
-          showResult();
-        }
-      }
+  document.getElementById('submit-btn').onclick = () => {
+    showResult();
+  };
 
-      document.getElementById('next-btn').onclick = nextQuestion;
-      document.getElementById('prev-btn').onclick = () => {
-        if (current > 0) {
-          current--;
-          renderQuestion();
-        }
-      };
+  function showResult() {
+    document.getElementById('quiz-app').innerHTML = `
+      <div class='m-auto text-center p-6'>
+        <h2 class='text-2xl font-bold'>🎉 Test Submitted</h2>
+        <p class='mt-2 text-lg'>You scored <strong>${score}</strong> out of ${questions.length}</p>
 
-      document.getElementById('submit-btn').onclick = () => {
-        showResult();
-      };
+        <div class='my-6'>
+          <script async="async" data-cfasync="false" src="//pl27748133.revenuecpmgate.com/f3a93d528569724dcead65358cfeccb8/invoke.js"></script>
+          <div id="container-f3a93d528569724dcead65358cfeccb8"></div>
+        </div>
+      </div>
+    `;
+  }
+</script>
 
-      function showResult() {
-        document.getElementById('quiz-app').innerHTML = `
-          <div class='m-auto text-center p-6'>
-            <h2 class='text-2xl font-bold'>🎉 Test Submitted</h2>
-            <p class='mt-2 text-lg'>You scored <strong>${score}</strong> out of ${questions.length}</p>
-          </div>
-        `;
-      }
-    </script>
   </body>
 </html>
