@@ -3,923 +3,757 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Study Tracker - 14 Days Hybrid Continuous Serial</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Neuro Quiz Master</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .progress-bar {
-            height: 20px;
-            background-color: #e5e7eb;
-            border-radius: 10px;
+        :root {
+            color-scheme: light;
+            --surface: rgba(15, 23, 42, 0.75);
+            --surface-strong: rgba(30, 41, 59, 0.85);
+            --accent: #38bdf8;
+            --accent-strong: #0ea5e9;
+            --correct: #22c55e;
+            --incorrect: #ef4444;
+            --text-primary: #f8fafc;
+            --text-muted: #cbd5f5;
+            --border: rgba(148, 163, 184, 0.25);
+            --radius-lg: 24px;
+            --radius-md: 18px;
+            --shadow-xl: 0 25px 50px -12px rgba(15, 23, 42, 0.45);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at top left, #0f172a, #1e293b 45%, #312e81 100%);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            padding: 32px 16px 48px;
+        }
+
+        .app-shell {
+            width: min(960px, 100%);
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .badge {
+            width: fit-content;
+            padding: 6px 16px;
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--accent);
+            border-radius: 999px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(32px, 5vw, 44px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        header p {
+            margin: 0;
+            max-width: 60ch;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        main {
+            background: var(--surface);
+            backdrop-filter: blur(18px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            padding: clamp(20px, 4vw, 36px);
+            box-shadow: var(--shadow-xl);
+            display: grid;
+            gap: 24px;
+        }
+
+        .status-bar {
+            display: grid;
+            gap: 12px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .status-card {
+            background: var(--surface-strong);
+            border-radius: var(--radius-md);
+            padding: 14px 18px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .status-card span {
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .status-card strong {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .progress-track {
+            height: 10px;
+            width: 100%;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.2);
             overflow: hidden;
         }
+
         .progress-fill {
             height: 100%;
-            background-color: #10b981;
-            transition: width 0.3s ease-in-out;
+            width: 0;
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+            transition: width 0.35s ease;
         }
-        .daily-progress-bar {
-            height: 15px;
-            background-color: #e5e7eb;
-            border-radius: 8px;
-            overflow: hidden;
+
+        .question-card {
+            background: var(--surface-strong);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            padding: clamp(18px, 3vw, 28px);
+            display: grid;
+            gap: 18px;
         }
-        .daily-progress-fill {
-            height: 100%;
-            background-color: #34d399;
+
+        .question-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-muted);
+            font-size: 14px;
         }
-        details summary {
+
+        .question-text {
+            font-size: clamp(20px, 2.4vw, 24px);
+            line-height: 1.5;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option-card {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 16px;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.55);
+            padding: 16px 18px;
+            border-radius: 20px;
+            border: 1px solid transparent;
             cursor: pointer;
-            padding: 10px;
-            background-color: #f3f4f6;
-            border-radius: 5px;
+            transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+            text-align: left;
         }
-        details[open] summary {
-            background-color: #e5e7eb;
+
+        .option-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(56, 189, 248, 0.35);
         }
-        textarea {
-            resize: vertical;
-            min-height: 60px;
+
+        .option-card.selected {
+            border-color: var(--accent);
+            background: rgba(56, 189, 248, 0.12);
         }
-        #save-notification {
-            transition: opacity 0.5s ease-in-out;
+
+        .option-card.correct {
+            border-color: rgba(34, 197, 94, 0.5);
+            background: rgba(22, 163, 74, 0.18);
+        }
+
+        .option-card.incorrect {
+            border-color: rgba(239, 68, 68, 0.55);
+            background: rgba(185, 28, 28, 0.15);
+        }
+
+        .option-prefix {
+            height: 36px;
+            width: 36px;
+            border-radius: 50%;
+            background: rgba(148, 163, 184, 0.15);
+            display: grid;
+            place-items: center;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .option-card.correct .option-prefix {
+            background: rgba(34, 197, 94, 0.2);
+        }
+
+        .option-card.incorrect .option-prefix {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .option-card .option-check {
+            font-size: 18px;
+            color: transparent;
+        }
+
+        .option-card.correct .option-check {
+            color: var(--correct);
+        }
+
+        .option-card.incorrect .option-check {
+            color: var(--incorrect);
+        }
+
+        .cta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .helper-text {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        button.primary {
+            padding: 14px 22px;
+            border-radius: 999px;
+            border: none;
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+            color: #0f172a;
+            background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+            box-shadow: 0 20px 30px -15px rgba(14, 165, 233, 0.8);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        button.primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        button.primary:not(:disabled):hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 24px 35px -18px rgba(14, 165, 233, 0.9);
+        }
+
+        .explanation-card {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 18px;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            padding: 18px;
+            display: none;
+            gap: 12px;
+            line-height: 1.6;
+        }
+
+        .explanation-card.active {
+            display: block;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(239, 68, 68, 0.92);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 14px;
+            box-shadow: var(--shadow-xl);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(12px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .results-card {
+            display: none;
+            flex-direction: column;
+            gap: 18px;
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            padding: clamp(20px, 4vw, 36px);
+        }
+
+        .results-card.active {
+            display: flex;
+        }
+
+        .results-summary {
+            display: grid;
+            gap: 16px;
+        }
+
+        .results-summary h2 {
+            margin: 0;
+            font-size: clamp(24px, 4vw, 32px);
+        }
+
+        .pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .pill {
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .review-list {
+            display: grid;
+            gap: 12px;
+            max-height: 340px;
+            overflow: auto;
+            padding-right: 4px;
+        }
+
+        .review-item {
+            background: rgba(15, 23, 42, 0.55);
+            border-radius: 16px;
+            padding: 14px 16px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            display: grid;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        .review-item.correct {
+            border-color: rgba(34, 197, 94, 0.35);
+        }
+
+        .review-item.incorrect {
+            border-color: rgba(239, 68, 68, 0.35);
+        }
+
+        footer {
+            text-align: center;
+            color: rgba(226, 232, 240, 0.6);
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        @media (max-width: 720px) {
+            body {
+                padding: 24px 12px 32px;
+            }
+
+            .question-card {
+                padding: 16px;
+            }
+
+            .option-card {
+                grid-template-columns: auto 1fr;
+            }
+
+            .option-card .option-check {
+                display: none;
+            }
+
+            .cta-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            button.primary {
+                width: 100%;
+            }
+
+            .toast {
+                left: 16px;
+                right: 16px;
+                bottom: 16px;
+                text-align: center;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-100 font-sans">
-    <div class="container mx-auto p-4 max-w-4xl">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">Medical Study Tracker - 14 Days Hybrid Continuous Serial</h1>
-            <p class="text-gray-600 mt-2">Track your 14-day medical video schedule with progress and key concepts saved locally</p>
-            <div class="mt-4">
-                <div class="progress-bar w-full">
-                    <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
-                </div>
-                <p id="progress-text" class="text-gray-700 mt-2">Progress: 0% (0 / 8572.95 minutes, 0 / 142.88 hours)</p>
-            </div>
-            <button id="save-button" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save Progress & Notes</button>
-            <p id="save-notification" class="text-green-600 mt-2 opacity-0">Progress and notes saved!</p>
+<body>
+    <div class="app-shell">
+        <header>
+            <div class="badge">Neuroanatomy deck</div>
+            <h1>Neuro Quiz Master</h1>
+            <p>Sharpen your neuroanatomy knowledge with curated high-yield questions. Work through the deck, receive instant explanations, and track your mastery on any device.</p>
         </header>
 
         <main>
-            <!-- Day 1 -->
-            <details class="mb-4 bg-white rounded-lg shadow">
-                <summary class="text-lg font-semibold">Day 1 (~10h 12m)</summary>
-                <div class="p-4">
-                    <div class="daily-progress-bar w-full mb-4">
-                        <div id="day-1-progress-fill" class="daily-progress-fill" style="width: 0%"></div>
+            <section class="status-bar">
+                <div class="status-grid">
+                    <div class="status-card">
+                        <span>Question</span>
+                        <strong id="question-position">0 / 0</strong>
                     </div>
-                    <p id="day-1-progress-text" class="text-gray-700 mb-4">Day 1 Progress: 0% (0 / 612.35 minutes, 0 / 10.21 hours)</p>
-                    <ul class="space-y-4">
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="217.8333" data-id="026" data-day="1">
-                                1. Pathology: 026: Cell Injury and Inflammation (217m 50s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="026" placeholder="e.g., 10:30 - Inflammation pathways"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="85.7" data-id="040_day1" data-day="1">
-                                2. Pharmacology: 040: General Pharmacology (first 85m 42s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="040_day1" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="68.55" data-id="093" data-day="1">
-                                3. OBGYN: 093: Menstrual Cycle and Tests of Ovulation (68m 33s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="093" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="140.6" data-id="112_day1" data-day="1">
-                                4. Surgery: 112: General Surgery Part 1A (first 140m 36s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="112_day1" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="99.6667" data-id="123_day1" data-day="1">
-                                5. Medicine: 123: Cardiology Part-1 (first 99m 40s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="123_day1" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                    </ul>
+                    <div class="status-card">
+                        <span>Score</span>
+                        <strong id="score">0 pts</strong>
+                    </div>
+                    <div class="status-card">
+                        <span>Streak</span>
+                        <strong id="streak">0🔥</strong>
+                    </div>
                 </div>
-            </details>
+                <div class="progress-track" aria-hidden="true">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+            </section>
 
-            <!-- Day 2 -->
-            <details class="mb-4 bg-white rounded-lg shadow">
-                <summary class="text-lg font-semibold">Day 2 (~10h 12m)</summary>
-                <div class="p-4">
-                    <div class="daily-progress-bar w-full mb-4">
-                        <div id="day-2-progress-fill" class="daily-progress-fill" style="width: 0%"></div>
-                    </div>
-                    <p id="day-2-progress-text" class="text-gray-700 mb-4">Day 2 Progress: 0% (0 / 612.35 minutes, 0 / 10.21 hours)</p>
-                    <ul class="space-y-4">
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="103.8" data-id="027_day2" data-day="2">
-                                6. Pathology: 027: Genetics, Neoplasia and Immunity (first 103m 48s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="027_day2" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="43.0667" data-id="040_day2" data-day="2">
-                                7. Pharmacology: 040: General Pharmacology (remaining 43m 4s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="040_day2" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="43.1333" data-id="094" data-day="2">
-                                8. OBGYN: 094: Polycystic Ovarian Disease (43m 8s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="094" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="56.8333" data-id="112_day2" data-day="2">
-                                9. Surgery: 112: General Surgery Part 1A (remaining 56m 50s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="112_day2" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="108.1833" data-id="123_day2" data-day="2">
-                                10. Medicine: 123: Cardiology Part-1 (remaining 108m 11s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="123_day2" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="250.8" data-id="124_day2" data-day="2">
-                                11. Medicine: 124: Cardiology Part-2 (first 250m 48s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="124_day2" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                    </ul>
+            <section class="question-card" id="question-card" aria-live="polite">
+                <div class="question-meta">
+                    <span id="difficulty-tag">Loading deck…</span>
+                    <span id="question-id"></span>
                 </div>
-            </details>
+                <div class="question-text" id="question-text">
+                    Loading question…
+                </div>
+                <div class="options-grid" id="options-grid"></div>
+                <div class="cta-bar">
+                    <div class="helper-text" id="helper-text">Select an option to continue.</div>
+                    <button class="primary" id="action-button" disabled>Submit answer</button>
+                </div>
+            </section>
 
-            <!-- Day 3 -->
-            <details class="mb-4 bg-white rounded-lg shadow">
-                <summary class="text-lg font-semibold">Day 3 (~10h 12m)</summary>
-                <div class="p-4">
-                    <div class="daily-progress-bar w-full mb-4">
-                        <div id="day-3-progress-fill" class="daily-progress-fill" style="width: 0%"></div>
-                    </div>
-                    <p id="day-3-progress-text" class="text-gray-700 mb-4">Day 3 Progress: 0% (0 / 612.35 minutes, 0 / 10.21 hours)</p>
-                    <ul class="space-y-4">
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="148.1333" data-id="027_day3" data-day="3">
-                                12. Pathology: 027: Genetics, Neoplasia and Immunity (remaining 148m 8s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="027_day3" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="85.7" data-id="041_day3" data-day="3">
-                                13. Pharmacology: 041: Autonomic Nervous System (first 85m 42s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="041_day3" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="71.75" data-id="095" data-day="3">
-                                14. OBGYN: 095: Carcinoma Cervix and Carcinoma Endometrium (71m 45s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="095" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="140.6" data-id="113a_day3" data-day="3">
-                                15. Surgery: 113a: General Surgery Part 1B (first 140m 36s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="113a_day3" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="166.1667" data-id="124_day3" data-day="3">
-                                16. Medicine: 124: Cardiology Part-2 (remaining 166m 10s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="124_day3" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                    </ul>
-                </div>
-            </details>
+            <article class="explanation-card" id="explanation-card">
+                <strong>Explanation</strong>
+                <p id="explanation-text"></p>
+            </article>
 
-            <!-- Day 4 -->
-            <details class="mb-4 bg-white rounded-lg shadow">
-                <summary class="text-lg font-semibold">Day 4 (~10h 12m)</summary>
-                <div class="p-4">
-                    <div class="daily-progress-bar w-full mb-4">
-                        <div id="day-4-progress-fill" class="daily-progress-fill" style="width: 0%"></div>
+            <section class="results-card" id="results-card">
+                <div class="results-summary">
+                    <h2>Your mastery snapshot</h2>
+                    <p id="results-subtitle"></p>
+                    <div class="pill-row">
+                        <span class="pill" id="pill-score"></span>
+                        <span class="pill" id="pill-accuracy"></span>
+                        <span class="pill" id="pill-duration"></span>
                     </div>
-                    <p id="day-4-progress-text" class="text-gray-700 mb-4">Day 4 Progress: 0% (0 / 612.35 minutes, 0 / 10.21 hours)</p>
-                    <ul class="space-y-4">
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="56.2" data-id="028" data-day="4">
-                                17. Pathology: 028: Cardiovascular Pathology (56m 12s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="028" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="27.7667" data-id="041_day4" data-day="4">
-                                18. Pharmacology: 041: Autonomic Nervous System (remaining 27m 46s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="041_day4" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="45.25" data-id="096" data-day="4">
-                                19. OBGYN: 096: Ovarian Tumors (45m 15s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="096" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="39.4" data-id="113a_day4" data-day="4">
-                                20. Surgery: 113a: General Surgery Part 1B (remaining 39m 24s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="113a_day4" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="73.5" data-id="125" data-day="4">
-                                21. Medicine: 125: Cardiology Part-3 (73m 30s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="125" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="141.9167" data-id="126" data-day="4">
-                                22. Medicine: 126: Rheumatology (141m 55s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="126" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                    </ul>
                 </div>
-            </details>
-
-            <!-- Day 5 -->
-            <details class="mb-4 bg-white rounded-lg shadow">
-                <summary class="text-lg font-semibold">Day 5 (~10h 12m)</summary>
-                <div class="p-4">
-                    <div class="daily-progress-bar w-full mb-4">
-                        <div id="day-5-progress-fill" class="daily-progress-fill" style="width: 0%"></div>
-                    </div>
-                    <p id="day-5-progress-text" class="text-gray-700 mb-4">Day 5 Progress: 0% (0 / 612.35 minutes, 0 / 10.21 hours)</p>
-                    <ul class="space-y-4">
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="41.0333" data-id="029" data-day="5">
-                                23. Pathology: 029: Vasculitis and Vascular Tumors (41m 2s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="029" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="64.0167" data-id="042" data-day="5">
-                                24. Pharmacology: 042: Autacoids (64m 1s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="042" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="90.0167" data-id="097" data-day="5">
-                                25. OBGYN: 097: Adenomyosis, Abnormal Uterine Bleeding, Mullerian Defects (90m 1s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="097" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="140.6" data-id="113b_day5" data-day="5">
-                                26. Surgery: 113b: General Surgery Part 1B (first 140m 36s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="113b_day5" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="203.1" data-id="127" data-day="5">
-                                27. Medicine: 127: Neurology Part-1 (203m 6s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="127" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                    </ul>
+                <div>
+                    <h3 style="margin: 0 0 12px; font-size: 18px;">Review your answers</h3>
+                    <div class="review-list" id="review-list"></div>
                 </div>
-            </details>
-
-            <!-- Day 6 -->
-            <details class="mb-4 bg-white rounded-lg shadow">
-                <summary class="text-lg font-semibold">Day 6 (~10h 12m)</summary>
-                <div class="p-4">
-                    <div class="daily-progress-bar w-full mb-4">
-                        <div id="day-6-progress-fill" class="daily-progress-fill" style="width: 0%"></div>
-                    </div>
-                    <p id="day-6-progress-text" class="text-gray-700 mb-4">Day 6 Progress: 0% (0 / 612.35 minutes, 0 / 10.21 hours)</p>
-                    <ul class="space-y-4">
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="47.75" data-id="030" data-day="6">
-                                28. Pathology: 030: Lung Pathology (47m 45s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="030" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="85.7" data-id="043_day6" data-day="6">
-                                29. Pharmacology: 043: Cardiovascular System (first 85m 42s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="043_day6" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="68.6167" data-id="098" data-day="6">
-                                30. OBGYN: 098: Amenorrhea, Uterine Prolapse (68m 37s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="098" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="42.3667" data-id="113b_day6" data-day="6">
-                                31. Surgery: 113b: General Surgery Part 1B (remaining 42m 22s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="113b_day6" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="250.8" data-id="128_day6" data-day="6">
-                                32. Medicine: 128: Neurology Part-2 (first 250m 48s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="128_day6" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                    </ul>
+                <div class="cta-bar">
+                    <button class="primary" id="restart-button">Try again</button>
                 </div>
-            </details>
-
-            <!-- Day 7 -->
-            <details class="mb-4 bg-white rounded-lg shadow">
-                <summary class="text-lg font-semibold">Day 7 (~10h 12m)</summary>
-                <div class="p-4">
-                    <div class="daily-progress-bar w-full mb-4">
-                        <div id="day-7-progress-fill" class="daily-progress-fill" style="width: 0%"></div>
-                    </div>
-                    <p id="day-7-progress-text" class="text-gray-700 mb-4">Day 7 Progress: 0% (0 / 612.35 minutes, 0 / 10.21 hours)</p>
-                    <ul class="space-y-4">
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="85.0333" data-id="031" data-day="7">
-                                33. Pathology: 031: Gastrointestinal Pathology (85m 2s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="031" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="24.1167" data-id="043_day7" data-day="7">
-                                34. Pharmacology: 043: Cardiovascular System (remaining 24m 7s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="043_day7" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="58.4" data-id="099" data-day="7">
-                                35. OBGYN: 099: Contraception (58m 24s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="099" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="140.6" data-id="114_day7" data-day="7">
-                                36. Surgery: 114: General Surgery Part 2A (first 140m 36s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="114_day7" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="44.5167" data-id="128_day7" data-day="7">
-                                37. Medicine: 128: Neurology Part-2 (remaining 44m 31s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="128_day7" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="123.5833" data-id="129" data-day="7">
-                                38. Medicine: 129: Endocrinology (123m 35s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="129" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                    </ul>
-                </div>
-            </details>
-
-            <!-- Day 8 -->
-            <details class="mb-4 bg-white rounded-lg shadow">
-                <summary class="text-lg font-semibold">Day 8 (~10h 12m)</summary>
-                <div class="p-4">
-                    <div class="daily-progress-bar w-full mb-4">
-                        <div id="day-8-progress-fill" class="daily-progress-fill" style="width: 0%"></div>
-                    </div>
-                    <p id="day-8-progress-text" class="text-gray-700 mb-4">Day 8 Progress: 0% (0 / 612.35 minutes, 0 / 10.21 hours)</p>
-                    <ul class="space-y-4">
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="43.0833" data-id="032" data-day="8">
-                                39. Pathology: 032: Hepatobiliary Pathology (43m 5s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="032" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="85.7" data-id="044_day8" data-day="8">
-                                40. Pharmacology: 044: Central Nervous System (first 85m 42s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="044_day8" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="56.1167" data-id="100" data-day="8">
-                                41. OBGYN: 100: Medical Disorders in Pregnancy (56m 7s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="100" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="103" data-id="114_day8" data-day="8">
-                                42. Surgery: 114: General Surgery Part 2A (remaining 103m)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="114_day8" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="198.2333" data-id="130" data-day="8">
-                                43. Medicine: 130: Kidney (198m 14s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="130" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                    </ul>
-                </div>
-            </details>
-
-            <!-- Day 9 -->
-            <details class="mb-4 bg-white rounded-lg shadow">
-                <summary class="text-lg font-semibold">Day 9 (~10h 12m)</summary>
-                <div class="p-4">
-                    <div class="daily-progress-bar w-full mb-4">
-                        <div id="day-9-progress-fill" class="daily-progress-fill" style="width: 0%"></div>
-                    </div>
-                    <p id="day-9-progress-text" class="text-gray-700 mb-4">Day 9 Progress: 0% (0 / 612.35 minutes, 0 / 10.21 hours)</p>
-                    <ul class="space-y-4">
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="67.1833" data-id="033" data-day="9">
-                                44. Pathology: 033: Renal Pathology (67m 11s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="033" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="53.1667" data-id="044_day9" data-day="9">
-                                45. Pharmacology: 044: Central Nervous System (remaining 53m 10s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="044_day9" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="94.7667" data-id="101" data-day="9">
-                                46. OBGYN: 101: Obstetric Hemorrhage, Abortions (94m 46s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="101" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="140.6" data-id="115a_day9" data-day="9">
-                                47. Surgery: 115a: General Surgery Part 2B (first 140m 36s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="115a_day9" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="138.6833" data-id="131" data-day="9">
-                                48. Medicine: 131: Respiratory System (138m 41s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="131" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                    </ul>
-                </div>
-            </details>
-
-            <!-- Day 10 -->
-            <details class="mb-4 bg-white rounded-lg shadow">
-                <summary class="text-lg font-semibold">Day 10 (~10h 12m)</summary>
-                <div class="p-4">
-                    <div class="daily-progress-bar w-full mb-4">
-                        <div id="day-10-progress-fill" class="daily-progress-fill" style="width: 0%"></div>
-                    </div>
-                    <p id="day-10-progress-text" class="text-gray-700 mb-4">Day 10 Progress: 0% (0 / 612.35 minutes, 0 / 10.21 hours)</p>
-                    <ul class="space-y-4">
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="49.25" data-id="034" data-day="10">
-                                49. Pathology: 034: Female and Male Genital System (49m 15s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="034" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="85.8333" data-id="045" data-day="10">
-                                50. Pharmacology: 045: Endocrine System (85m 50s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="045" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="31.5" data-id="102" data-day="10">
-                                51. OBGYN: 102: Prenatal Diagnosis (31m 30s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="102" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="84.7167" data-id="115a_day10" data-day="10">
-                                52. Surgery: 115a: General Surgery Part 2B (remaining 84m 43s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="115a_day10" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="250.8" data-id="132_day10" data-day="10">
-                                53. Medicine: 132: Liver, GIT, and Hematology (first 250m 48s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="132_day10" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                    </ul>
-                </div>
-            </details>
-
-            <!-- Day 11 -->
-            <details class="mb-4 bg-white rounded-lg shadow">
-                <summary class="text-lg font-semibold">Day 11 (~10h 12m)</summary>
-                <div class="p-4">
-                    <div class="daily-progress-bar w-full mb-4">
-                        <div id="day-11-progress-fill" class="daily-progress-fill" style="width: 0%"></div>
-                    </div>
-                    <p id="day-11-progress-text" class="text-gray-700 mb-4">Day 11 Progress: 0% (0 / 612.35 minutes, 0 / 10.21 hours)</p>
-                    <ul class="space-y-4">
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="38.4667" data-id="035" data-day="11">
-                                54. Pathology: 035: CNS Pathology (38m 28s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="035" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="80.1833" data-id="046" data-day="11">
-                                55. Pharmacology: 046: Anti Microbials Part-1 (80m 11s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="046" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="62.7167" data-id="103" data-day="11">
-                                56. OBGYN: 103: Physiological Changes in Pregnancy (62m 43s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="103" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="38.0333" data-id="115b" data-day="11">
-                                57. Surgery: 115b: General Surgery Part 2B (38m 2s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="115b" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="44.9333" data-id="132_day11" data-day="11">
-                                58. Medicine: 132: Liver, GIT, and Hematology (remaining 44m 56s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="132_day11" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="67.85" data-id="134" data-day="11">
-                                59. Medicine: 134: Medicine Image Discussion Part-2 (67m 51s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="134" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                    </ul>
-                </div>
-            </details>
-
-            <!-- Day 12 -->
-            <details class="mb-4 bg-white rounded-lg shadow">
-                <summary class="text-lg font-semibold">Day 12 (~10h 12m)</summary>
-                <div class="p-4">
-                    <div class="daily-progress-bar w-full mb-4">
-                        <div id="day-12-progress-fill" class="daily-progress-fill" style="width: 0%"></div>
-                    </div>
-                    <p id="day-12-progress-text" class="text-gray-700 mb-4">Day 12 Progress: 0% (0 / 612.35 minutes, 0 / 10.21 hours)</p>
-                    <ul class="space-y-4">
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="90.7667" data-id="037" data-day="12">
-                                60. Pathology: 037: Adenomyosis and Abnormal Uterine Bleeding (90m 46s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="037" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="75.9333" data-id="047" data-day="12">
-                                61. Pharmacology: 047: Anti Microbials Part-2 (75m 56s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="047" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="29.6667" data-id="104" data-day="12">
-                                62. OBGYN: 104: Molar Pregnancy (29m 40s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="104" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="140.6" data-id="116_day12" data-day="12">
-                                63. Surgery: 116: Hepatobiliary Pancreatic Surgery (first 140m 36s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="116_day12" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="250.8" data-id="116_day12_med" data-day="12">
-                                Review: Review/Catch-up (placeholder for 250m 48s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="116_day12_med" placeholder="e.g., 10:30 - Review notes"></textarea>
-                        </li>
-                    </ul>
-                </div>
-            </details>
-
-            <!-- Day 13 -->
-            <details class="mb-4 bg-white rounded-lg shadow">
-                <summary class="text-lg font-semibold">Day 13 (~10h 12m)</summary>
-                <div class="p-4">
-                    <div class="daily-progress-bar w-full mb-4">
-                        <div id="day-13-progress-fill" class="daily-progress-fill" style="width: 0%"></div>
-                    </div>
-                    <p id="day-13-progress-text" class="text-gray-700 mb-4">Day 13 Progress: 0% (0 / 612.35 minutes, 0 / 10.21 hours)</p>
-                    <ul class="space-y-4">
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="175.5667" data-id="038" data-day="13">
-                                64. Pathology: 038: Pathology Image Discussion Part-1 (175m 34s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="038" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="33.8333" data-id="048" data-day="13">
-                                65. Pharmacology: 048: Respiratory System (33m 50s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="048" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="33.4167" data-id="105" data-day="13">
-                                66. OBGYN: 105: Ectopic Pregnancy (33m 25s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="105" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="87.9" data-id="116_day13" data-day="13">
-                                67. Surgery: 116: Hepatobiliary Pancreatic Surgery (remaining 87m 54s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="116_day13" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="142.2" data-id="117" data-day="13">
-                                68. Surgery: 117: GIT Part-1 (Esophagus, Stomach, Peritoneum) (142m 12s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="117" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                    </ul>
-                </div>
-            </details>
-
-            <!-- Day 14 -->
-            <details class="mb-4 bg-white rounded-lg shadow">
-                <summary class="text-lg font-semibold">Day 14 (~10h 12m)</summary>
-                <div class="p-4">
-                    <div class="daily-progress-bar w-full mb-4">
-                        <div id="day-14-progress-fill" class="daily-progress-fill" style="width: 0%"></div>
-                    </div>
-                    <p id="day-14-progress-text" class="text-gray-700 mb-4">Day 14 Progress: 0% (0 / 612.35 minutes, 0 / 10.21 hours)</p>
-                    <ul class="space-y-4">
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="213.2333" data-id="039" data-day="14">
-                                69. Pathology: 039: Pathology Image Discussion Part-2 (213m 14s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="039" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="30.85" data-id="049" data-day="14">
-                                70. Pharmacology: 049: GIT (30m 51s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="049" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="61.5667" data-id="050" data-day="14">
-                                71. Pharmacology: 050: Blood Disorders (61m 34s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="050" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="105.2833" data-id="051" data-day="14">
-                                72. Pharmacology: 051: Miscellaneous (105m 17s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="051" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="106.2" data-id="106" data-day="14">
-                                73. OBGYN: 106: Stages of Normal Labor, Partogram (106m 12s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="106" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="125.3" data-id="107" data-day="14">
-                                74. OBGYN: 107: Obstetrics and Gynecology Image Discussion (125m 18s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="107" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="154.75" data-id="118" data-day="14">
-                                75. Surgery: 118: GIT Part-2 (Intestinal Obstruction, Small & Large Intestine) (154m 45s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="118" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="90.4833" data-id="119" data-day="14">
-                                76. Surgery: 119: Breast, Thyroid, Parathyroid (90m 29s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="119" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="135.4667" data-id="120" data-day="14">
-                                77. Surgery: 120: Hernia, Genitourinary System (135m 28s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="120" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="128" data-id="121" data-day="14">
-                                78. Surgery: 121: Vascular Surgery (128m)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="121" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                        <li class="flex flex-col">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="video-checkbox mr-2" data-duration="194.5667" data-id="122" data-day="14">
-                                79. Surgery: 122: Surgery Image Discussion (194m 34s)
-                            </label>
-                            <textarea class="notes-input w-full mt-1 p-2 border rounded" data-id="122" placeholder="e.g., 10:30 - Key concept"></textarea>
-                        </li>
-                    </ul>
-                    <p class="text-gray-600 mt-4">Use remaining time for review or catch-up.</p>
-                </div>
-            </details>
+            </section>
         </main>
 
-        <footer class="text-center mt-8 text-gray-600">
-            <p>Total Duration: 8572.95 minutes (~142.88 hours)</p>
-            <p>Created on June 16, 2025</p>
+        <footer>
+            Built for rapid review • Updated <span id="updated-date"></span>
         </footer>
     </div>
 
+    <div class="toast" id="toast" role="status" aria-live="assertive">Select an option before submitting.</div>
+
     <script>
-        const TOTAL_DURATION = 8572.95; // Total duration in minutes
-        const DAILY_DURATIONS = {
-            1: 612.35,
-            2: 612.35,
-            3: 612.35,
-            4: 612.35,
-            5: 612.35,
-            6: 612.35,
-            7: 612.35,
-            8: 612.35,
-            9: 612.35,
-            10: 612.35,
-            11: 612.35,
-            12: 612.35,
-            13: 612.35,
-            14: 612.35
+        const QUESTION_LIMIT = 20;
+        const state = {
+            deck: [],
+            index: 0,
+            score: 0,
+            streak: 0,
+            bestStreak: 0,
+            selection: null,
+            isSubmitted: false,
+            timeline: [],
+            startTime: null
         };
 
-        // Show save notification
-        function showSaveNotification() {
-            const notification = document.getElementById('save-notification');
-            notification.style.opacity = '1';
-            setTimeout(() => {
-                notification.style.opacity = '0';
-            }, 2000);
-        }
+        const questionCard = document.getElementById('question-card');
+        const resultsCard = document.getElementById('results-card');
+        const explanationCard = document.getElementById('explanation-card');
+        const explanationText = document.getElementById('explanation-text');
+        const optionsGrid = document.getElementById('options-grid');
+        const questionText = document.getElementById('question-text');
+        const difficultyTag = document.getElementById('difficulty-tag');
+        const questionIdLabel = document.getElementById('question-id');
+        const helperText = document.getElementById('helper-text');
+        const actionButton = document.getElementById('action-button');
+        const restartButton = document.getElementById('restart-button');
+        const progressFill = document.getElementById('progress-fill');
+        const questionPosition = document.getElementById('question-position');
+        const scoreLabel = document.getElementById('score');
+        const streakLabel = document.getElementById('streak');
+        const toast = document.getElementById('toast');
+        const resultsSubtitle = document.getElementById('results-subtitle');
+        const pillScore = document.getElementById('pill-score');
+        const pillAccuracy = document.getElementById('pill-accuracy');
+        const pillDuration = document.getElementById('pill-duration');
+        const reviewList = document.getElementById('review-list');
+        const updatedDate = document.getElementById('updated-date');
 
-        // Save progress and notes
-        function saveProgressAndNotes() {
-            const checkboxes = document.querySelectorAll('.video-checkbox');
-            const notesInputs = document.querySelectorAll('.notes-input');
+        updatedDate.textContent = new Date().toLocaleDateString(undefined, {
+            year: 'numeric', month: 'short', day: 'numeric'
+        });
 
-            checkboxes.forEach(checkbox => {
-                localStorage.setItem(`video_${checkbox.dataset.id}`, checkbox.checked);
-            });
-
-            notesInputs.forEach(input => {
-                localStorage.setItem(`notes_${input.dataset.id}`, input.value);
-            });
-
-            showSaveNotification();
-        }
-
-        // Update progress
-        function updateProgress() {
-            const checkboxes = document.querySelectorAll('.video-checkbox');
-            let totalCompletedMinutes = 0;
-            const dailyCompletedMinutes = {};
-
-            // Initialize daily totals
-            for (let day = 1; day <= 14; day++) {
-                dailyCompletedMinutes[day] = 0;
-            }
-
-            // Calculate completed minutes
-            checkboxes.forEach(checkbox => {
-                if (checkbox.checked) {
-                    const duration = parseFloat(checkbox.dataset.duration);
-                    const day = checkbox.dataset.day;
-                    totalCompletedMinutes += duration;
-                    dailyCompletedMinutes[day] = (dailyCompletedMinutes[day] || 0) + duration;
+        async function loadDeck() {
+            try {
+                const response = await fetch('quiz.json');
+                if (!response.ok) {
+                    throw new Error('Unable to load quiz bank.');
                 }
-            });
-
-            // Update overall progress
-            const percentCompleted = (totalCompletedMinutes / TOTAL_DURATION) * 100;
-            const totalHours = (totalCompletedMinutes / 60).toFixed(2);
-            const totalDurationHours = (TOTAL_DURATION / 60).toFixed(2);
-            document.getElementById('progress-fill').style.width = `${percentCompleted}%`;
-            document.getElementById('progress-text').textContent = 
-                `Progress: ${Math.round(percentCompleted)}% (${Math.round(totalCompletedMinutes)} / ${Math.round(TOTAL_DURATION)} minutes, ${totalHours} / ${totalDurationHours} hours)`;
-
-            // Update daily progress
-            for (let day = 1; day <= 14; day++) {
-                const dailyPercent = (dailyCompletedMinutes[day] / DAILY_DURATIONS[day]) * 100;
-                const dailyHours = (dailyCompletedMinutes[day] / 60).toFixed(2);
-                const dailyTotalHours = (DAILY_DURATIONS[day] / 60).toFixed(2);
-                document.getElementById(`day-${day}-progress-fill`).style.width = `${dailyPercent}%`;
-                document.getElementById(`day-${day}-progress-text`).textContent = 
-                    `Day ${day} Progress: ${Math.round(dailyPercent)}% (${Math.round(dailyCompletedMinutes[day] || 0)} / ${Math.round(DAILY_DURATIONS[day])} minutes, ${dailyHours} / ${dailyTotalHours} hours)`;
+                const data = await response.json();
+                const shuffled = data.slice().sort(() => Math.random() - 0.5);
+                state.deck = QUESTION_LIMIT ? shuffled.slice(0, Math.min(QUESTION_LIMIT, shuffled.length)) : shuffled;
+                state.startTime = performance.now();
+                renderQuestion();
+            } catch (error) {
+                questionText.textContent = 'We hit a snag while loading your questions.';
+                helperText.textContent = 'Check your connection and refresh the page to retry.';
+                console.error(error);
             }
-
-            // Auto-save on update
-            saveProgressAndNotes();
         }
 
-        // Load saved progress and notes
-        document.querySelectorAll('.video-checkbox').forEach(checkbox => {
-            const savedState = localStorage.getItem(`video_${checkbox.dataset.id}`);
-            if (savedState === 'true') {
-                checkbox.checked = true;
+        function renderQuestion() {
+            const question = state.deck[state.index];
+            if (!question) {
+                return;
             }
-            checkbox.addEventListener('change', updateProgress);
-        });
 
-        document.querySelectorAll('.notes-input').forEach(input => {
-            const savedNotes = localStorage.getItem(`notes_${input.dataset.id}`);
-            if (savedNotes) {
-                input.value = savedNotes;
+            questionPosition.textContent = `${state.index + 1} / ${state.deck.length}`;
+            scoreLabel.textContent = `${state.score} pts`;
+            streakLabel.textContent = `${state.streak}\u{1F525}`;
+
+            questionText.textContent = question.question;
+            questionIdLabel.textContent = `ID ${question.id}`;
+            difficultyTag.textContent = `Question ${state.index + 1}`;
+            helperText.textContent = 'Select an option to continue.';
+            actionButton.textContent = 'Submit answer';
+            actionButton.disabled = true;
+            state.selection = null;
+            state.isSubmitted = false;
+            explanationCard.classList.remove('active');
+            explanationText.textContent = '';
+
+            optionsGrid.innerHTML = '';
+            Object.entries(question.options).forEach(([letter, text], optionIndex) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'option-card';
+                button.dataset.index = optionIndex;
+                button.innerHTML = `
+                    <span class="option-prefix">${letter}</span>
+                    <span>${text}</span>
+                    <span class="option-check">\u2713</span>
+                `;
+                button.addEventListener('click', () => handleSelection(optionIndex));
+                optionsGrid.appendChild(button);
+            });
+
+            updateProgress();
+        }
+
+        function handleSelection(optionIndex) {
+            if (state.isSubmitted) {
+                return;
             }
-            input.addEventListener('input', saveProgressAndNotes);
-        });
 
-        // Save button event
-        document.getElementById('save-button').addEventListener('click', saveProgressAndNotes);
+            state.selection = optionIndex;
+            actionButton.disabled = false;
+            helperText.textContent = 'Ready? Submit to check your answer.';
 
-        // Initial progress update
-        updateProgress();
+            [...optionsGrid.children].forEach((button, idx) => {
+                button.classList.toggle('selected', idx === optionIndex);
+            });
+        }
+
+        function handleSubmit() {
+            if (!state.deck[state.index]) {
+                return;
+            }
+
+            if (!state.isSubmitted && state.selection === null) {
+                triggerToast();
+                return;
+            }
+
+            if (!state.isSubmitted) {
+                gradeSelection();
+            } else {
+                goToNextQuestion();
+            }
+        }
+
+        function gradeSelection() {
+            const question = state.deck[state.index];
+            const isCorrect = state.selection === question.correctIndex;
+
+            if (isCorrect) {
+                state.score += 1;
+                state.streak += 1;
+                state.bestStreak = Math.max(state.bestStreak, state.streak);
+            } else {
+                state.streak = 0;
+            }
+
+            state.timeline.push({
+                id: question.id,
+                prompt: question.question,
+                correctIndex: question.correctIndex,
+                selected: state.selection,
+                options: question.options,
+                explanation: question.explanation,
+                isCorrect
+            });
+
+            [...optionsGrid.children].forEach((button, idx) => {
+                button.classList.remove('selected');
+                if (idx === question.correctIndex) {
+                    button.classList.add('correct');
+                }
+                if (idx === state.selection && !isCorrect) {
+                    button.classList.add('incorrect');
+                }
+                button.disabled = true;
+            });
+
+            explanationText.textContent = question.explanation || 'No explanation available for this prompt.';
+            explanationCard.classList.add('active');
+            helperText.textContent = isCorrect ? 'Nice work! Keep the streak going.' : 'Review the explanation and continue.';
+            actionButton.textContent = state.index + 1 === state.deck.length ? 'View results' : 'Next question';
+            state.isSubmitted = true;
+        }
+
+        function goToNextQuestion() {
+            state.index += 1;
+            if (state.index >= state.deck.length) {
+                showResults();
+                return;
+            }
+
+            renderQuestion();
+        }
+
+        function updateProgress() {
+            if (!state.deck.length) {
+                progressFill.style.width = '0%';
+                return;
+            }
+            const percent = ((state.index) / state.deck.length) * 100;
+            progressFill.style.width = `${Math.min(percent, 100)}%`;
+        }
+
+        function triggerToast() {
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        function showResults() {
+            const total = state.deck.length;
+            const accuracy = total ? Math.round((state.score / total) * 100) : 0;
+            const durationMs = state.startTime ? performance.now() - state.startTime : 0;
+            const durationMin = durationMs / 60000;
+
+            questionCard.style.display = 'none';
+            explanationCard.classList.remove('active');
+            resultsCard.classList.add('active');
+            actionButton.disabled = true;
+
+            questionPosition.textContent = `${total} / ${total}`;
+            scoreLabel.textContent = `${state.score} pts`;
+            streakLabel.textContent = `${state.bestStreak}\u{1F525}`;
+            progressFill.style.width = '100%';
+
+            resultsSubtitle.textContent = `You mastered ${state.score} out of ${total} questions.`;
+            pillScore.textContent = `Score: ${state.score} pts`;
+            pillAccuracy.textContent = `Accuracy: ${accuracy}%`;
+            pillDuration.textContent = `Time on deck: ${durationMin < 1 ? '<1 min' : durationMin.toFixed(1) + ' min'}`;
+
+            reviewList.innerHTML = '';
+            state.timeline.forEach((entry, idx) => {
+                const item = document.createElement('div');
+                item.className = `review-item ${entry.isCorrect ? 'correct' : 'incorrect'}`;
+                const optionsMarkup = Object.entries(entry.options)
+                    .map(([letter, text], optionIdx) => {
+                        const highlight = optionIdx === entry.correctIndex ? ' (correct)' : optionIdx === entry.selected ? ' (your pick)' : '';
+                        return `<div>${letter}. ${text}${highlight}</div>`;
+                    })
+                    .join('');
+                item.innerHTML = `
+                    <strong>${idx + 1}. ${entry.prompt}</strong>
+                    ${optionsMarkup}
+                    <em>${entry.explanation}</em>
+                `;
+                reviewList.appendChild(item);
+            });
+        }
+
+        function restartQuiz() {
+            state.index = 0;
+            state.score = 0;
+            state.streak = 0;
+            state.bestStreak = 0;
+            state.selection = null;
+            state.isSubmitted = false;
+            state.timeline = [];
+            state.startTime = performance.now();
+            questionCard.style.display = 'grid';
+            resultsCard.classList.remove('active');
+            explanationCard.classList.remove('active');
+            actionButton.disabled = true;
+            actionButton.textContent = 'Submit answer';
+            loadDeck();
+        }
+
+        actionButton.addEventListener('click', handleSubmit);
+        restartButton.addEventListener('click', restartQuiz);
+        loadDeck();
     </script>
 </body>
 </html>
