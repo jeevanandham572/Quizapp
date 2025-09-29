@@ -25,7 +25,12 @@
   </head>
   <body class="bg-gradient-to-br from-blue-50 to-purple-100 min-h-screen flex">
     <div id="quiz-app" class="flex flex-col w-full p-4">
-      <div id="question-selector" class="flex flex-wrap gap-2 mb-4 justify-center"></div>
+      <div class="flex justify-center mb-4">
+        <label for="question-dropdown" class="mr-2 font-medium text-gray-700">Jump to Question:</label>
+        <select id="question-dropdown" class="px-4 py-2 rounded border border-gray-300">
+          <option disabled selected>Loading...</option>
+        </select>
+      </div>
 
       <main class="max-w-4xl w-full mx-auto bg-white shadow-lg rounded-lg p-6">
         <div class="flex justify-between items-center mb-4">
@@ -51,6 +56,10 @@
           <button id="prev-btn" class="px-4 py-2 bg-gray-300 rounded">⬅ Prev</button>
           <button id="next-btn" class="px-4 py-2 bg-blue-600 text-white rounded">Next ➡</button>
         </div>
+
+        <div class="text-center mt-6">
+          <button id="submit-btn" class="px-6 py-3 bg-green-600 text-white rounded shadow-md hover:bg-green-700">✅ Submit Test</button>
+        </div>
       </main>
     </div>
 
@@ -66,23 +75,24 @@
         .then(data => {
           questions = data;
           document.getElementById('qTotal').textContent = questions.length;
-          renderQuestionSelector();
+          populateDropdown();
           renderQuestion();
         });
 
-      function renderQuestionSelector() {
-        const container = document.getElementById('question-selector');
-        container.innerHTML = '';
+      function populateDropdown() {
+        const dropdown = document.getElementById('question-dropdown');
+        dropdown.innerHTML = '';
         questions.forEach((_, idx) => {
-          const btn = document.createElement('button');
-          btn.textContent = idx + 1;
-          btn.className = 'px-3 py-1 rounded bg-blue-100 hover:bg-blue-300 text-sm';
-          btn.onclick = () => {
-            current = idx;
-            renderQuestion();
-          };
-          container.appendChild(btn);
+          const option = document.createElement('option');
+          option.value = idx;
+          option.textContent = `Question ${idx + 1}`;
+          dropdown.appendChild(option);
         });
+        dropdown.selectedIndex = current;
+        dropdown.onchange = (e) => {
+          current = parseInt(e.target.value);
+          renderQuestion();
+        };
       }
 
       function renderQuestion() {
@@ -107,6 +117,8 @@
           }
         }, 1000);
 
+        const savedAnswer = selectedAnswers[current];
+
         Object.entries(q.options).forEach(([key, value]) => {
           const label = document.createElement('label');
           label.className = 'block p-2 border rounded hover:bg-blue-50 cursor-pointer';
@@ -116,7 +128,7 @@
           input.value = key;
           input.className = 'mr-2';
 
-          if (selectedAnswers[current] && selectedAnswers[current] === key) {
+          if (savedAnswer && savedAnswer === key) {
             input.checked = true;
             showAnswerFeedback(key);
           }
@@ -126,6 +138,8 @@
           label.appendChild(document.createTextNode(`${key}. ${value}`));
           document.getElementById('options-form').appendChild(label);
         });
+
+        document.getElementById('question-dropdown').selectedIndex = current;
       }
 
       function handleAnswer(selectedKey) {
@@ -173,8 +187,33 @@
         }
       };
 
+      document.getElementById('submit-btn').onclick = () => {
+        showResult();
+      };
+
       function showResult() {
-        document.getElementById('quiz-app').innerHTML = `<div class='m-auto text-center p-6'><h2 class='text-2xl font-bold'>🎉 Quiz Completed!</h2><p class='mt-2'>You scored <strong>${score}</strong> out of ${questions.length}</p></div>`;
+        let html = `<div class='max-w-3xl mx-auto bg-white p-6 rounded shadow'>
+          <h2 class='text-2xl font-bold text-center mb-4'>🎉 Test Submitted</h2>
+          <p class='text-lg text-center mb-6'>You scored <strong>${score}</strong> out of ${questions.length}</p>
+          <h3 class='text-xl font-semibold mb-4'>📊 Detailed Report</h3>
+          <ol class='space-y-4'>`;
+
+        questions.forEach((q, i) => {
+          const yourAnswer = selectedAnswers[i];
+          const isCorrect = yourAnswer === q.answerKey;
+          const statusClass = isCorrect ? 'text-green-700' : 'text-red-700';
+          html += `<li>
+            <div class='font-medium'>Q${i + 1}. ${q.question}</div>
+            <div class='ml-4'>
+              <div>Your Answer: <span class='${statusClass} font-semibold'>${yourAnswer || 'Not answered'}</span></div>
+              <div>Correct Answer: <strong>${q.answerKey}</strong></div>
+              <div class='text-sm text-gray-600'>Explanation: ${q.explanation}</div>
+            </div>
+          </li>`;
+        });
+
+        html += '</ol></div>';
+        document.getElementById('quiz-app').innerHTML = html;
       }
     </script>
   </body>
