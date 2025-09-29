@@ -1,759 +1,162 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neuro Quiz Master</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!DOCTYPE html><html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz App</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        :root {
-            color-scheme: light;
-            --surface: rgba(15, 23, 42, 0.75);
-            --surface-strong: rgba(30, 41, 59, 0.85);
-            --accent: #38bdf8;
-            --accent-strong: #0ea5e9;
-            --correct: #22c55e;
-            --incorrect: #ef4444;
-            --text-primary: #f8fafc;
-            --text-muted: #cbd5f5;
-            --border: rgba(148, 163, 184, 0.25);
-            --radius-lg: 24px;
-            --radius-md: 18px;
-            --shadow-xl: 0 25px 50px -12px rgba(15, 23, 42, 0.45);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: radial-gradient(circle at top left, #0f172a, #1e293b 45%, #312e81 100%);
-            color: var(--text-primary);
-            display: flex;
-            justify-content: center;
-            align-items: stretch;
-            padding: 32px 16px 48px;
-        }
-
-        .app-shell {
-            width: min(960px, 100%);
-            margin: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            animation: fadeIn 0.6s ease;
-        }
-
-        header {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .badge {
-            width: fit-content;
-            padding: 6px 16px;
-            background: rgba(56, 189, 248, 0.12);
-            color: var(--accent);
-            border-radius: 999px;
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            font-size: 12px;
-        }
-
-        h1 {
-            margin: 0;
-            font-size: clamp(32px, 5vw, 44px);
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-
-        header p {
-            margin: 0;
-            max-width: 60ch;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
-
-        main {
-            background: var(--surface);
-            backdrop-filter: blur(18px);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            padding: clamp(20px, 4vw, 36px);
-            box-shadow: var(--shadow-xl);
-            display: grid;
-            gap: 24px;
-        }
-
-        .status-bar {
-            display: grid;
-            gap: 12px;
-        }
-
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-        }
-
-        .status-card {
-            background: var(--surface-strong);
-            border-radius: var(--radius-md);
-            padding: 14px 18px;
-            border: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .status-card span {
-            font-size: 12px;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--text-muted);
-        }
-
-        .status-card strong {
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .progress-track {
-            height: 10px;
-            width: 100%;
-            border-radius: 999px;
-            background: rgba(148, 163, 184, 0.2);
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            width: 0;
-            border-radius: inherit;
-            background: linear-gradient(90deg, var(--accent), var(--accent-strong));
-            transition: width 0.35s ease;
-        }
-
-        .question-card {
-            background: var(--surface-strong);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border);
-            padding: clamp(18px, 3vw, 28px);
-            display: grid;
-            gap: 18px;
-        }
-
-        .question-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        .question-text {
-            font-size: clamp(20px, 2.4vw, 24px);
-            line-height: 1.5;
-        }
-
-        .options-grid {
-            display: grid;
-            gap: 12px;
-        }
-
-        .option-card {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            gap: 16px;
-            align-items: center;
-            background: rgba(15, 23, 42, 0.55);
-            padding: 16px 18px;
-            border-radius: 20px;
-            border: 1px solid transparent;
-            cursor: pointer;
-            transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
-            text-align: left;
-        }
-
-        .option-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(56, 189, 248, 0.35);
-        }
-
-        .option-card.selected {
-            border-color: var(--accent);
-            background: rgba(56, 189, 248, 0.12);
-        }
-
-        .option-card.correct {
-            border-color: rgba(34, 197, 94, 0.5);
-            background: rgba(22, 163, 74, 0.18);
-        }
-
-        .option-card.incorrect {
-            border-color: rgba(239, 68, 68, 0.55);
-            background: rgba(185, 28, 28, 0.15);
-        }
-
-        .option-prefix {
-            height: 36px;
-            width: 36px;
-            border-radius: 50%;
-            background: rgba(148, 163, 184, 0.15);
-            display: grid;
-            place-items: center;
-            font-weight: 600;
-            font-size: 15px;
-        }
-
-        .option-card.correct .option-prefix {
-            background: rgba(34, 197, 94, 0.2);
-        }
-
-        .option-card.incorrect .option-prefix {
-            background: rgba(239, 68, 68, 0.2);
-        }
-
-        .option-card .option-check {
-            font-size: 18px;
-            color: transparent;
-        }
-
-        .option-card.correct .option-check {
-            color: var(--correct);
-        }
-
-        .option-card.incorrect .option-check {
-            color: var(--incorrect);
-        }
-
-        .cta-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .helper-text {
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        button.primary {
-            padding: 14px 22px;
-            border-radius: 999px;
-            border: none;
-            font-weight: 600;
-            font-size: 16px;
-            letter-spacing: 0.01em;
-            cursor: pointer;
-            color: #0f172a;
-            background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-            box-shadow: 0 20px 30px -15px rgba(14, 165, 233, 0.8);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        button.primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        button.primary:not(:disabled):hover {
-            transform: translateY(-2px) scale(1.01);
-            box-shadow: 0 24px 35px -18px rgba(14, 165, 233, 0.9);
-        }
-
-        .explanation-card {
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 18px;
-            border: 1px solid rgba(56, 189, 248, 0.25);
-            padding: 18px;
-            display: none;
-            gap: 12px;
-            line-height: 1.6;
-        }
-
-        .explanation-card.active {
-            display: block;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: rgba(239, 68, 68, 0.92);
-            color: white;
-            padding: 12px 18px;
-            border-radius: 14px;
-            box-shadow: var(--shadow-xl);
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(12px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .results-card {
-            display: none;
-            flex-direction: column;
-            gap: 18px;
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            padding: clamp(20px, 4vw, 36px);
-        }
-
-        .results-card.active {
-            display: flex;
-        }
-
-        .results-summary {
-            display: grid;
-            gap: 16px;
-        }
-
-        .results-summary h2 {
-            margin: 0;
-            font-size: clamp(24px, 4vw, 32px);
-        }
-
-        .pill-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .pill {
-            padding: 8px 16px;
-            border-radius: 999px;
-            border: 1px solid rgba(148, 163, 184, 0.3);
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .review-list {
-            display: grid;
-            gap: 12px;
-            max-height: 340px;
-            overflow: auto;
-            padding-right: 4px;
-        }
-
-        .review-item {
-            background: rgba(15, 23, 42, 0.55);
-            border-radius: 16px;
-            padding: 14px 16px;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            display: grid;
-            gap: 6px;
-            font-size: 14px;
-        }
-
-        .review-item.correct {
-            border-color: rgba(34, 197, 94, 0.35);
-        }
-
-        .review-item.incorrect {
-            border-color: rgba(239, 68, 68, 0.35);
-        }
-
-        footer {
-            text-align: center;
-            color: rgba(226, 232, 240, 0.6);
-            font-size: 13px;
-            margin-top: 12px;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(24px);
-            }
-            to {
-                opacity: 1;
-                transform: none;
-            }
-        }
-
-        @media (max-width: 720px) {
-            body {
-                padding: 24px 12px 32px;
-            }
-
-            .question-card {
-                padding: 16px;
-            }
-
-            .option-card {
-                grid-template-columns: auto 1fr;
-            }
-
-            .option-card .option-check {
-                display: none;
-            }
-
-            .cta-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            button.primary {
-                width: 100%;
-            }
-
-            .toast {
-                left: 16px;
-                right: 16px;
-                bottom: 16px;
-                text-align: center;
-            }
-        }
+      body {
+        font-family: 'Inter', sans-serif;
+      }
     </style>
-</head>
-<body>
-    <div class="app-shell">
-        <header>
-            <div class="badge">Neuroanatomy deck</div>
-            <h1>Neuro Quiz Master</h1>
-            <p>Sharpen your neuroanatomy knowledge with curated high-yield questions. Work through the deck, receive instant explanations, and track your mastery on any device.</p>
-        </header>
+  </head>
+  <body class="bg-gradient-to-br from-blue-50 to-purple-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white shadow-2xl rounded-2xl p-8 max-w-xl w-full animate__animated animate__fadeIn">
+      <div class="flex justify-between items-center mb-2">
+        <h1 class="text-2xl font-bold text-blue-700">🧠 Smart Quiz</h1>
+        <div id="score-counter" class="text-sm text-gray-600 font-medium">Score: 0 | Q1 of N</div>
+      </div><div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+    <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%;"></div>
+  </div>
 
-        <main>
-            <section class="status-bar">
-                <div class="status-grid">
-                    <div class="status-card">
-                        <span>Question</span>
-                        <strong id="question-position">0 / 0</strong>
-                    </div>
-                    <div class="status-card">
-                        <span>Score</span>
-                        <strong id="score">0 pts</strong>
-                    </div>
-                    <div class="status-card">
-                        <span>Streak</span>
-                        <strong id="streak">0🔥</strong>
-                    </div>
-                </div>
-                <div class="progress-track" aria-hidden="true">
-                    <div class="progress-fill" id="progress-fill"></div>
-                </div>
-            </section>
-
-            <section class="question-card" id="question-card" aria-live="polite">
-                <div class="question-meta">
-                    <span id="difficulty-tag">Loading deck…</span>
-                    <span id="question-id"></span>
-                </div>
-                <div class="question-text" id="question-text">
-                    Loading question…
-                </div>
-                <div class="options-grid" id="options-grid"></div>
-                <div class="cta-bar">
-                    <div class="helper-text" id="helper-text">Select an option to continue.</div>
-                    <button class="primary" id="action-button" disabled>Submit answer</button>
-                </div>
-            </section>
-
-            <article class="explanation-card" id="explanation-card">
-                <strong>Explanation</strong>
-                <p id="explanation-text"></p>
-            </article>
-
-            <section class="results-card" id="results-card">
-                <div class="results-summary">
-                    <h2>Your mastery snapshot</h2>
-                    <p id="results-subtitle"></p>
-                    <div class="pill-row">
-                        <span class="pill" id="pill-score"></span>
-                        <span class="pill" id="pill-accuracy"></span>
-                        <span class="pill" id="pill-duration"></span>
-                    </div>
-                </div>
-                <div>
-                    <h3 style="margin: 0 0 12px; font-size: 18px;">Review your answers</h3>
-                    <div class="review-list" id="review-list"></div>
-                </div>
-                <div class="cta-bar">
-                    <button class="primary" id="restart-button">Try again</button>
-                </div>
-            </section>
-        </main>
-
-        <footer>
-            Built for rapid review • Updated <span id="updated-date"></span>
-        </footer>
+  <div id="quiz-box">
+    <div class="flex justify-between items-center mb-2">
+      <div id="question-container" class="text-lg font-medium"></div>
+      <div id="timer" class="text-sm font-bold text-red-500"></div>
     </div>
+    <ul id="options-container" class="space-y-3"></ul>
+    <div id="explanation" class="hidden mt-4 p-4 bg-yellow-100 text-yellow-800 rounded-md text-sm"></div>
+    <button id="next-btn" class="mt-6 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">Submit</button>
+  </div>
+  <div id="result-box" class="hidden mt-6 text-center text-xl font-semibold text-green-700"></div>
+</div>
 
-    <div class="toast" id="toast" role="status" aria-live="assertive">Select an option before submitting.</div>
+<script>
+  let currentQuestion = 0;
+  let score = 0;
+  let selectedKey = null;
+  let questions = [];
+  let answered = false;
+  let timer;
+  let timeLeft = 30;
 
-    <script>
-        const QUESTION_LIMIT = 20;
-        const state = {
-            deck: [],
-            index: 0,
-            score: 0,
-            streak: 0,
-            bestStreak: 0,
-            selection: null,
-            isSubmitted: false,
-            timeline: [],
-            startTime: null
-        };
+  fetch('./quiz.json')
+    .then((res) => res.json())
+    .then((data) => {
+      questions = data;
+      loadQuestion();
+    });
 
-        const questionCard = document.getElementById('question-card');
-        const resultsCard = document.getElementById('results-card');
-        const explanationCard = document.getElementById('explanation-card');
-        const explanationText = document.getElementById('explanation-text');
-        const optionsGrid = document.getElementById('options-grid');
-        const questionText = document.getElementById('question-text');
-        const difficultyTag = document.getElementById('difficulty-tag');
-        const questionIdLabel = document.getElementById('question-id');
-        const helperText = document.getElementById('helper-text');
-        const actionButton = document.getElementById('action-button');
-        const restartButton = document.getElementById('restart-button');
-        const progressFill = document.getElementById('progress-fill');
-        const questionPosition = document.getElementById('question-position');
-        const scoreLabel = document.getElementById('score');
-        const streakLabel = document.getElementById('streak');
-        const toast = document.getElementById('toast');
-        const resultsSubtitle = document.getElementById('results-subtitle');
-        const pillScore = document.getElementById('pill-score');
-        const pillAccuracy = document.getElementById('pill-accuracy');
-        const pillDuration = document.getElementById('pill-duration');
-        const reviewList = document.getElementById('review-list');
-        const updatedDate = document.getElementById('updated-date');
+  function updateCounter() {
+    document.getElementById("score-counter").innerText = `Score: ${score} | Q${currentQuestion + 1} of ${questions.length}`;
+    document.getElementById("progress-bar").style.width = `${((currentQuestion) / questions.length) * 100}%`;
+  }
 
-        updatedDate.textContent = new Date().toLocaleDateString(undefined, {
-            year: 'numeric', month: 'short', day: 'numeric'
-        });
+  function startTimer() {
+    clearInterval(timer);
+    timeLeft = 30;
+    document.getElementById("timer").innerText = `${timeLeft}s`;
 
-        async function loadDeck() {
-            try {
-                const response = await fetch('quiz.json');
-                if (!response.ok) {
-                    throw new Error('Unable to load quiz bank.');
-                }
-                const data = await response.json();
-                const shuffled = data.slice().sort(() => Math.random() - 0.5);
-                state.deck = QUESTION_LIMIT ? shuffled.slice(0, Math.min(QUESTION_LIMIT, shuffled.length)) : shuffled;
-                state.startTime = performance.now();
-                renderQuestion();
-            } catch (error) {
-                questionText.textContent = 'We hit a snag while loading your questions.';
-                helperText.textContent = 'Check your connection and refresh the page to retry.';
-                console.error(error);
-            }
+    timer = setInterval(() => {
+      timeLeft--;
+      document.getElementById("timer").innerText = `${timeLeft}s`;
+
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        document.getElementById("timer").innerText = "⏱ Time's up!";
+        document.getElementById("next-btn").click();
+      }
+    }, 1000);
+  }
+
+  function loadQuestion() {
+    const q = questions[currentQuestion];
+    document.getElementById("question-container").innerText = `Q${currentQuestion + 1}: ${q.question}`;
+    const optionsContainer = document.getElementById("options-container");
+    optionsContainer.innerHTML = "";
+    selectedKey = null;
+    answered = false;
+    updateCounter();
+    startTimer();
+
+    const explanationBox = document.getElementById("explanation");
+    explanationBox.classList.add("hidden");
+    explanationBox.innerText = "";
+
+    for (const key in q.options) {
+      const li = document.createElement("li");
+      li.innerHTML = `<button class="w-full text-left p-3 rounded-lg border border-gray-300 hover:bg-blue-50 transition" data-key="${key}"><strong>${key}.</strong> ${q.options[key]}</button>`;
+
+      li.querySelector("button").addEventListener("click", () => {
+        if (answered) return;
+        document.querySelectorAll("#options-container button").forEach((el) =>
+          el.classList.remove("bg-blue-100", "ring-2", "ring-blue-500")
+        );
+        li.querySelector("button").classList.add("bg-blue-100", "ring-2", "ring-blue-500");
+        selectedKey = key;
+      });
+
+      optionsContainer.appendChild(li);
+    }
+  }
+
+  document.getElementById("next-btn").addEventListener("click", () => {
+    clearInterval(timer);
+    const q = questions[currentQuestion];
+    if (!answered) {
+      const correctKey = q.answerKey;
+      const explanation = q.explanation;
+
+      document.querySelectorAll("#options-container button").forEach((btn) => {
+        const key = btn.dataset.key;
+        if (key === correctKey) {
+          btn.classList.add("bg-green-100", "text-green-800");
         }
-
-        function renderQuestion() {
-            const question = state.deck[state.index];
-            if (!question) {
-                return;
-            }
-
-            questionPosition.textContent = `${state.index + 1} / ${state.deck.length}`;
-            scoreLabel.textContent = `${state.score} pts`;
-            streakLabel.textContent = `${state.streak}\u{1F525}`;
-
-            questionText.textContent = question.question;
-            questionIdLabel.textContent = `ID ${question.id}`;
-            difficultyTag.textContent = `Question ${state.index + 1}`;
-            helperText.textContent = 'Select an option to continue.';
-            actionButton.textContent = 'Submit answer';
-            actionButton.disabled = true;
-            state.selection = null;
-            state.isSubmitted = false;
-            explanationCard.classList.remove('active');
-            explanationText.textContent = '';
-
-            optionsGrid.innerHTML = '';
-            Object.entries(question.options).forEach(([letter, text], optionIndex) => {
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.className = 'option-card';
-                button.dataset.index = optionIndex;
-                button.innerHTML = `
-                    <span class="option-prefix">${letter}</span>
-                    <span>${text}</span>
-                    <span class="option-check">\u2713</span>
-                `;
-                button.addEventListener('click', () => handleSelection(optionIndex));
-                optionsGrid.appendChild(button);
-            });
-
-            updateProgress();
+        if (key === selectedKey && key !== correctKey) {
+          btn.classList.add("bg-red-100", "text-red-800");
         }
+        btn.disabled = true;
+      });
 
-        function handleSelection(optionIndex) {
-            if (state.isSubmitted) {
-                return;
-            }
+      if (selectedKey === correctKey) {
+        score++;
+      }
 
-            state.selection = optionIndex;
-            actionButton.disabled = false;
-            helperText.textContent = 'Ready? Submit to check your answer.';
+      const explanationBox = document.getElementById("explanation");
+      explanationBox.classList.remove("hidden");
+      explanationBox.classList.add("animate__animated", "animate__fadeInUp");
+      explanationBox.innerText = `📘 Explanation: ${explanation}`;
 
-            [...optionsGrid.children].forEach((button, idx) => {
-                button.classList.toggle('selected', idx === optionIndex);
-            });
-        }
+      answered = true;
+      document.getElementById("next-btn").innerText =
+        currentQuestion === questions.length - 1 ? "Finish" : "Next";
+    } else {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+        document.getElementById("next-btn").innerText = "Submit";
+      } else {
+        document.getElementById("quiz-box").classList.add("hidden");
+        const resultBox = document.getElementById("result-box");
+        resultBox.classList.remove("hidden");
+        resultBox.classList.add("animate__animated", "animate__fadeIn");
+        resultBox.innerText = `🎉 You scored ${score} out of ${questions.length}`;
+        document.getElementById("progress-bar").style.width = `100%`;
+        if (score === questions.length) confetti();
+      }
+    }
+  });
 
-        function handleSubmit() {
-            if (!state.deck[state.index]) {
-                return;
-            }
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js');
+    });
+  }
+</script>
 
-            if (!state.isSubmitted && state.selection === null) {
-                triggerToast();
-                return;
-            }
-
-            if (!state.isSubmitted) {
-                gradeSelection();
-            } else {
-                goToNextQuestion();
-            }
-        }
-
-        function gradeSelection() {
-            const question = state.deck[state.index];
-            const isCorrect = state.selection === question.correctIndex;
-
-            if (isCorrect) {
-                state.score += 1;
-                state.streak += 1;
-                state.bestStreak = Math.max(state.bestStreak, state.streak);
-            } else {
-                state.streak = 0;
-            }
-
-            state.timeline.push({
-                id: question.id,
-                prompt: question.question,
-                correctIndex: question.correctIndex,
-                selected: state.selection,
-                options: question.options,
-                explanation: question.explanation,
-                isCorrect
-            });
-
-            [...optionsGrid.children].forEach((button, idx) => {
-                button.classList.remove('selected');
-                if (idx === question.correctIndex) {
-                    button.classList.add('correct');
-                }
-                if (idx === state.selection && !isCorrect) {
-                    button.classList.add('incorrect');
-                }
-                button.disabled = true;
-            });
-
-            explanationText.textContent = question.explanation || 'No explanation available for this prompt.';
-            explanationCard.classList.add('active');
-            helperText.textContent = isCorrect ? 'Nice work! Keep the streak going.' : 'Review the explanation and continue.';
-            actionButton.textContent = state.index + 1 === state.deck.length ? 'View results' : 'Next question';
-            state.isSubmitted = true;
-        }
-
-        function goToNextQuestion() {
-            state.index += 1;
-            if (state.index >= state.deck.length) {
-                showResults();
-                return;
-            }
-
-            renderQuestion();
-        }
-
-        function updateProgress() {
-            if (!state.deck.length) {
-                progressFill.style.width = '0%';
-                return;
-            }
-            const percent = ((state.index) / state.deck.length) * 100;
-            progressFill.style.width = `${Math.min(percent, 100)}%`;
-        }
-
-        function triggerToast() {
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2000);
-        }
-
-        function showResults() {
-            const total = state.deck.length;
-            const accuracy = total ? Math.round((state.score / total) * 100) : 0;
-            const durationMs = state.startTime ? performance.now() - state.startTime : 0;
-            const durationMin = durationMs / 60000;
-
-            questionCard.style.display = 'none';
-            explanationCard.classList.remove('active');
-            resultsCard.classList.add('active');
-            actionButton.disabled = true;
-
-            questionPosition.textContent = `${total} / ${total}`;
-            scoreLabel.textContent = `${state.score} pts`;
-            streakLabel.textContent = `${state.bestStreak}\u{1F525}`;
-            progressFill.style.width = '100%';
-
-            resultsSubtitle.textContent = `You mastered ${state.score} out of ${total} questions.`;
-            pillScore.textContent = `Score: ${state.score} pts`;
-            pillAccuracy.textContent = `Accuracy: ${accuracy}%`;
-            pillDuration.textContent = `Time on deck: ${durationMin < 1 ? '<1 min' : durationMin.toFixed(1) + ' min'}`;
-
-            reviewList.innerHTML = '';
-            state.timeline.forEach((entry, idx) => {
-                const item = document.createElement('div');
-                item.className = `review-item ${entry.isCorrect ? 'correct' : 'incorrect'}`;
-                const optionsMarkup = Object.entries(entry.options)
-                    .map(([letter, text], optionIdx) => {
-                        const highlight = optionIdx === entry.correctIndex ? ' (correct)' : optionIdx === entry.selected ? ' (your pick)' : '';
-                        return `<div>${letter}. ${text}${highlight}</div>`;
-                    })
-                    .join('');
-                item.innerHTML = `
-                    <strong>${idx + 1}. ${entry.prompt}</strong>
-                    ${optionsMarkup}
-                    <em>${entry.explanation}</em>
-                `;
-                reviewList.appendChild(item);
-            });
-        }
-
-        function restartQuiz() {
-            state.index = 0;
-            state.score = 0;
-            state.streak = 0;
-            state.bestStreak = 0;
-            state.selection = null;
-            state.isSubmitted = false;
-            state.timeline = [];
-            state.startTime = performance.now();
-            questionCard.style.display = 'grid';
-            resultsCard.classList.remove('active');
-            explanationCard.classList.remove('active');
-            actionButton.disabled = true;
-            actionButton.textContent = 'Submit answer';
-            loadDeck();
-        }
-
-        actionButton.addEventListener('click', handleSubmit);
-        restartButton.addEventListener('click', restartQuiz);
-        loadDeck();
-    </script>
-</body>
+  </body>
 </html>
