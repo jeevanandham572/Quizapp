@@ -1,162 +1,163 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quiz App</title>
-    <link rel="manifest" href="manifest.json">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Smart Quiz – All-in-One</title>
+    <link rel="manifest" href="manifest.json" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-      body {
-        font-family: 'Inter', sans-serif;
+      html, body {
+        height: 100%;
+        font-family: 'Comic Neue', 'Comic Sans MS', cursive, sans-serif;
+      }
+      .dark-mode {
+        background-color: #1a202c;
+        color: #f7fafc;
       }
     </style>
   </head>
-  <body class="bg-gradient-to-br from-blue-50 to-purple-100 min-h-screen flex items-center justify-center">
-    <div class="bg-white shadow-2xl rounded-2xl p-8 max-w-xl w-full animate__animated animate__fadeIn">
-      <div class="flex justify-between items-center mb-2">
-        <h1 class="text-2xl font-bold text-blue-700">🧠 Smart Quiz</h1>
-        <div id="score-counter" class="text-sm text-gray-600 font-medium">Score: 0 | Q1 of N</div>
-      </div><div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
-    <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%;"></div>
-  </div>
+  <body class="bg-gradient-to-br from-blue-50 to-purple-100 min-h-screen flex">
+    <div id="quiz-app" class="flex w-full">
+      <!-- Sidebar -->
+      <aside id="sidebar" class="w-20 bg-white border-r p-2 space-y-2 overflow-y-auto"></aside>
 
-  <div id="quiz-box">
-    <div class="flex justify-between items-center mb-2">
-      <div id="question-container" class="text-lg font-medium"></div>
-      <div id="timer" class="text-sm font-bold text-red-500"></div>
+      <!-- Main Quiz Area -->
+      <main class="flex-1 p-4 sm:p-10 max-w-6xl w-full mx-auto animate__animated animate__fadeIn">
+        <div class="flex justify-between items-center mb-4">
+          <h1 class="text-xl sm:text-3xl font-bold text-blue-700">🧠 Smart Quiz</h1>
+          <div class="flex gap-3 items-center">
+            <button id="darkToggle" class="text-xs px-3 py-1 border rounded">🌗 Toggle Mode</button>
+            <div id="score-counter" class="text-sm font-medium text-gray-700">Score: 0</div>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-2">
+          <div class="text-sm font-semibold">Question <span id="qNum">1</span> / <span id="qTotal">0</span></div>
+          <div class="text-sm font-semibold text-red-600" id="timer">30s</div>
+        </div>
+
+        <div id="question-box" class="mb-4">
+          <div id="question-text" class="text-lg font-semibold mb-2"></div>
+          <div id="question-media" class="mb-2"></div>
+          <button id="hint-btn" class="mb-2 text-xs text-blue-600 underline hidden">💡 Show Hint</button>
+          <div id="hint-text" class="text-sm text-yellow-600 hidden"></div>
+        </div>
+
+        <form id="options-form" class="space-y-3"></form>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 mt-6">
+          <div class="flex gap-2">
+            <button id="prev-btn" class="px-3 py-2 bg-gray-300 rounded">⬅ Prev</button>
+            <button id="next-btn" class="px-3 py-2 bg-blue-600 text-white rounded">Next ➡</button>
+          </div>
+          <div class="flex gap-2">
+            <button id="bookmark-btn" class="px-3 py-2 border rounded">⭐ Bookmark</button>
+            <button id="review-btn" class="px-3 py-2 border rounded">🟨 Mark for Review</button>
+            <button id="submit-btn" class="px-3 py-2 bg-green-600 text-white rounded">Submit</button>
+          </div>
+        </div>
+
+        <div id="explanation" class="hidden mt-4 p-4 bg-yellow-100 text-yellow-800 rounded-md text-sm"></div>
+
+        <div id="result-box" class="hidden mt-6"></div>
+      </main>
     </div>
-    <ul id="options-container" class="space-y-3"></ul>
-    <div id="explanation" class="hidden mt-4 p-4 bg-yellow-100 text-yellow-800 rounded-md text-sm"></div>
-    <button id="next-btn" class="mt-6 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">Submit</button>
-  </div>
-  <div id="result-box" class="hidden mt-6 text-center text-xl font-semibold text-green-700"></div>
-</div>
 
-<script>
-  let currentQuestion = 0;
-  let score = 0;
-  let selectedKey = null;
-  let questions = [];
-  let answered = false;
-  let timer;
-  let timeLeft = 30;
+    <script>
+      let questions = [];
+      let current = 0;
+      let score = 0;
+      let timerInterval;
+      const selectedAnswers = {};
 
-  fetch('./quiz.json')
-    .then((res) => res.json())
-    .then((data) => {
-      questions = data;
-      loadQuestion();
-    });
+      fetch('quiz.json')
+        .then(res => res.json())
+        .then(data => {
+          questions = data;
+          document.getElementById('qTotal').textContent = questions.length;
+          renderSidebar();
+          renderQuestion();
+        });
 
-  function updateCounter() {
-    document.getElementById("score-counter").innerText = `Score: ${score} | Q${currentQuestion + 1} of ${questions.length}`;
-    document.getElementById("progress-bar").style.width = `${((currentQuestion) / questions.length) * 100}%`;
-  }
-
-  function startTimer() {
-    clearInterval(timer);
-    timeLeft = 30;
-    document.getElementById("timer").innerText = `${timeLeft}s`;
-
-    timer = setInterval(() => {
-      timeLeft--;
-      document.getElementById("timer").innerText = `${timeLeft}s`;
-
-      if (timeLeft <= 0) {
-        clearInterval(timer);
-        document.getElementById("timer").innerText = "⏱ Time's up!";
-        document.getElementById("next-btn").click();
+      function renderSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.innerHTML = '';
+        questions.forEach((_, idx) => {
+          const btn = document.createElement('button');
+          btn.className = 'w-full py-2 text-sm bg-blue-100 rounded hover:bg-blue-300';
+          btn.textContent = idx + 1;
+          btn.onclick = () => {
+            current = idx;
+            renderQuestion();
+          };
+          sidebar.appendChild(btn);
+        });
       }
-    }, 1000);
-  }
 
-  function loadQuestion() {
-    const q = questions[currentQuestion];
-    document.getElementById("question-container").innerText = `Q${currentQuestion + 1}: ${q.question}`;
-    const optionsContainer = document.getElementById("options-container");
-    optionsContainer.innerHTML = "";
-    selectedKey = null;
-    answered = false;
-    updateCounter();
-    startTimer();
+      function renderQuestion() {
+        clearInterval(timerInterval);
+        const q = questions[current];
 
-    const explanationBox = document.getElementById("explanation");
-    explanationBox.classList.add("hidden");
-    explanationBox.innerText = "";
+        document.getElementById('qNum').textContent = current + 1;
+        document.getElementById('question-text').textContent = q.question;
+        document.getElementById('qTotal').textContent = questions.length;
+        document.getElementById('options-form').innerHTML = '';
 
-    for (const key in q.options) {
-      const li = document.createElement("li");
-      li.innerHTML = `<button class="w-full text-left p-3 rounded-lg border border-gray-300 hover:bg-blue-50 transition" data-key="${key}"><strong>${key}.</strong> ${q.options[key]}</button>`;
+        // Timer
+        let timeLeft = 30;
+        document.getElementById('timer').textContent = `${timeLeft}s`;
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          document.getElementById('timer').textContent = `${timeLeft}s`;
+          if (timeLeft === 0) {
+            clearInterval(timerInterval);
+            nextQuestion();
+          }
+        }, 1000);
 
-      li.querySelector("button").addEventListener("click", () => {
-        if (answered) return;
-        document.querySelectorAll("#options-container button").forEach((el) =>
-          el.classList.remove("bg-blue-100", "ring-2", "ring-blue-500")
-        );
-        li.querySelector("button").classList.add("bg-blue-100", "ring-2", "ring-blue-500");
-        selectedKey = key;
-      });
+        // Options
+        Object.entries(q.options).forEach(([key, value]) => {
+          const label = document.createElement('label');
+          label.className = 'block p-2 border rounded hover:bg-blue-50 cursor-pointer';
+          const input = document.createElement('input');
+          input.type = q.multi ? 'checkbox' : 'radio';
+          input.name = 'option';
+          input.value = key;
+          input.className = 'mr-2';
+          label.appendChild(input);
+          label.appendChild(document.createTextNode(`${key}. ${value}`));
+          document.getElementById('options-form').appendChild(label);
+        });
+      }
 
-      optionsContainer.appendChild(li);
-    }
-  }
-
-  document.getElementById("next-btn").addEventListener("click", () => {
-    clearInterval(timer);
-    const q = questions[currentQuestion];
-    if (!answered) {
-      const correctKey = q.answerKey;
-      const explanation = q.explanation;
-
-      document.querySelectorAll("#options-container button").forEach((btn) => {
-        const key = btn.dataset.key;
-        if (key === correctKey) {
-          btn.classList.add("bg-green-100", "text-green-800");
+      document.getElementById('next-btn').onclick = () => nextQuestion();
+      document.getElementById('prev-btn').onclick = () => {
+        if (current > 0) {
+          current--;
+          renderQuestion();
         }
-        if (key === selectedKey && key !== correctKey) {
-          btn.classList.add("bg-red-100", "text-red-800");
+      };
+
+      function nextQuestion() {
+        if (current < questions.length - 1) {
+          current++;
+          renderQuestion();
+        } else {
+          showResult();
         }
-        btn.disabled = true;
-      });
-
-      if (selectedKey === correctKey) {
-        score++;
       }
 
-      const explanationBox = document.getElementById("explanation");
-      explanationBox.classList.remove("hidden");
-      explanationBox.classList.add("animate__animated", "animate__fadeInUp");
-      explanationBox.innerText = `📘 Explanation: ${explanation}`;
-
-      answered = true;
-      document.getElementById("next-btn").innerText =
-        currentQuestion === questions.length - 1 ? "Finish" : "Next";
-    } else {
-      currentQuestion++;
-      if (currentQuestion < questions.length) {
-        loadQuestion();
-        document.getElementById("next-btn").innerText = "Submit";
-      } else {
-        document.getElementById("quiz-box").classList.add("hidden");
-        const resultBox = document.getElementById("result-box");
-        resultBox.classList.remove("hidden");
-        resultBox.classList.add("animate__animated", "animate__fadeIn");
-        resultBox.innerText = `🎉 You scored ${score} out of ${questions.length}`;
-        document.getElementById("progress-bar").style.width = `100%`;
-        if (score === questions.length) confetti();
+      function showResult() {
+        document.getElementById('quiz-app').innerHTML = `<div class='m-auto text-center p-6'><h2 class='text-2xl font-bold'>🎉 Quiz Completed!</h2><p class='mt-2'>You scored <strong>${score}</strong> out of ${questions.length}</p></div>`;
       }
-    }
-  });
 
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('service-worker.js');
-    });
-  }
-</script>
-
+      document.getElementById('darkToggle').onclick = () => {
+        document.body.classList.toggle('dark-mode');
+      };
+    </script>
   </body>
 </html>
